@@ -1,0 +1,9 @@
+<launch>
+	
+	<rosparam command="load" file="$(find active_env)/config/demo_inference.yaml" />
+	
+	<!-- Node for demonstration recording on Jaco arm. -->
+	<node name="demo_inference" pkg="active_env" type="demo_inference.py" output="screen"/>
+
+</launch>
+
