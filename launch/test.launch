@@ -1,0 +1,9 @@
+<launch>
+	
+	<rosparam command="load" file="$(find active_env)/config/test.yaml" />
+	
+	<!-- Node for demonstration recording on Jaco arm. -->
+	<node name="test" pkg="active_env" type="test.py" output="screen"/>
+
+</launch>
+

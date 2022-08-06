@@ -21,7 +21,7 @@ class DemoInference(object):
 	This class performs IRL inference on human demonstrations or simulated demonstrations.
 	"""
 	def __init__(self, loadfile):
-		loadfile = '../smart_env_ws/src/active_env/config/demo_inference.yaml'
+		# loadfile = '../smart_env_ws/src/active_env/config/demo_inference.yaml'
 		print loadfile
 		print os.getcwd()
 		stream = open(loadfile, 'r')
