@@ -85,49 +85,21 @@ class DemoLearner(object):
 		return P_obs
 
 
-	def learn_weights(self, trajs):
-		# Project all trajectories into feature space.
-		# new_features = [np.sum(self.environment.featurize(traj.waypts, self.feat_list), axis=1) for traj in trajs]
-		# Phi_H = np.array(np.sum(np.matrix(new_features), axis=0) / self.feat_range).T
-		# print "Phi_H: ", Phi_H
-
-		# # Now compute probabilities for each beta and theta pair.
-		# num_trajs = len(self.traj_rand.keys())
-		# P_xi = np.zeros((self.num_betas, self.num_weights))
-		# for (weight_i, weight) in enumerate(self.weights_list):
-		# 	print "Initiating inference with the following weights: ", weight
-		# 	for (beta_i, beta) in enumerate(self.betas_list):
-		# 		# Compute -beta*(weight^T*Phi(xi_H))
-		# 		numerator = -beta * np.dot(weight, Phi_H)
-
-		# 		# Calculate the integral in log space
-		# 		logdenom = np.zeros((num_trajs + 1,1))
-		# 		logdenom[-1] = -beta * np.dot(weight, Phi_H)
-
-		# 		# Compute costs for each of the random trajectories
-		# 		for rand_i in range(num_trajs):
-		# 			Phi_rand = self.Phi_rands[rand_i]
-
-		# 			# Compute each denominator log
-		# 			logdenom[rand_i] = -beta * np.dot(weight, Phi_rand)
-
-		# 		# Compute the sum in log space
-		# 		A_max = max(logdenom)
-		# 		expdif = logdenom - A_max
-		# 		denom = A_max + np.log(sum(np.exp(expdif)))
-
-		# 		# Get P(xi_H | beta, weight) by dividing them
-		# 		P_xi[beta_i][weight_i] = np.exp(numerator - denom * len(trajs))
-
+	def learn_weights(self, trajs, P_bt=False):
+		
 		# P_obs = P_xi / sum(sum(P_xi))
 		P_obs = self.calc_obs_model(trajs)
 
 		# Compute P(weight, beta | xi_H) via Bayes rule
-		posterior = np.multiply(P_obs, self.P_bt)
+		if P_bt:
+			posterior = np.multiply(P_obs, P_bt)
+		else:
+			posterior = np.multiply(P_obs, self.P_bt)
 
 		# Normalize posterior
 		posterior = posterior / sum(sum(posterior))
-		self.P_bt = posterior
+		if not P_bt: #update in-place
+			self.P_bt = posterior
 
 		# Compute optimal expected weight
 		P_weight = sum(posterior, 0)
@@ -141,7 +113,7 @@ class DemoLearner(object):
 		print("theta average: " + str(weights))
 		print("beta average: " + str(beta))
 
-		self.visualize_posterior(self.P_bt)
+		self.visualize_posterior(posterior)
 		return weights
 
 	def visualize_posterior(self, post):
