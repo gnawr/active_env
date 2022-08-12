@@ -20,8 +20,9 @@ class DemoInference(object):
 	"""
 	This class performs IRL inference on human demonstrations or simulated demonstrations.
 	"""
-	def __init__(self, loadfile):
-		# loadfile = '../smart_env_ws/src/active_env/config/demo_inference.yaml'
+	# def __init__(self, loadfile):
+	def __init__(self):
+		loadfile = 'config/demo_inference.yaml'
 		print loadfile
 		print os.getcwd()
 		stream = open(loadfile, 'r')
@@ -89,6 +90,7 @@ if __name__ == '__main__':
 	if len(sys.argv) < 1:
 		print "ERROR: Need to provide parameters file (yaml) as input."
 	else:
-		DemoInference(sys.argv[1])
+		# DemoInference(sys.argv[1])
+		DemoInference()
 
 
