@@ -94,6 +94,8 @@ class DevTest(unittest.TestCase):
 		print('Cartesian of manip:', ee_xyz)
 		raw_input("Visualizing GOAL. Press Enter to continue...")
 
+		env.kill_environment
+
 
 
 

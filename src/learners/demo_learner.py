@@ -84,29 +84,31 @@ class DemoLearner(object):
 		P_obs = P_xi / sum(sum(P_xi))
 		return P_obs
 
-
-	def learn_weights(self, trajs, P_bt=False):
-		
+	def learn_posterior(self, trajs, P_bt):
 		# P_obs = P_xi / sum(sum(P_xi))
 		P_obs = self.calc_obs_model(trajs)
 
 		# Compute P(weight, beta | xi_H) via Bayes rule
-		if P_bt:
-			posterior = np.multiply(P_obs, P_bt)
-		else:
-			posterior = np.multiply(P_obs, self.P_bt)
-
+		posterior = np.multiply(P_obs, P_bt)
+		
 		# Normalize posterior
 		posterior = posterior / sum(sum(posterior))
+		return posterior
+
+
+	def learn_weights(self, trajs, P_bt=False):
 		if not P_bt: #update in-place
+			posterior = self.learn_posterior(trajs, self.P_bt)
 			self.P_bt = posterior
+		else: 
+			posterior = self.learn_posterior(trajs, P_bt)
 
 		# Compute optimal expected weight
 		P_weight = sum(posterior, 0)
 		weights = np.sum(np.transpose(self.weights_list)*P_weight, 1)
 		P_beta = np.sum(posterior, axis=1)
 		beta = np.dot(self.betas_list,P_beta)
-		print("observation model: ", P_obs)
+		# print("observation model: ", P_obs)
 		print("posterior: ", self.P_bt)
 		print("theta marginal: " + str(P_weight))
 		print("beta marginal: " + str(P_beta))
@@ -116,20 +118,24 @@ class DemoLearner(object):
 		self.visualize_posterior(posterior)
 		return weights
 
-	def visualize_posterior(self, post):
+	def visualize_posterior(self, post, save=''):
 		matplotlib.rcParams['font.sans-serif'] = "Arial"
 		matplotlib.rcParams['font.family'] = "Times New Roman"
 		matplotlib.rcParams.update({'font.size': 15})
 
+
+		print(post.shape)
 		plt.imshow(post, cmap='Blues', interpolation='nearest')
 		plt.colorbar()
 
 		weights_rounded = [[round(i,2) for i in j] for j in self.weights_list]
 		plt.xticks(range(len(self.weights_list)), weights_rounded, rotation = 'vertical')
-		plt.yticks(range(len(self.betas_list)), list(self.betas_list))
+		# plt.yticks(range(len(self.betas_list)), list(self.betas_list))
 		plt.xlabel(r'$\theta$', fontsize=15)
-		plt.ylabel(r'$\beta$',fontsize=15)
+		# plt.ylabel(r'$\beta$',fontsize=15)
 		plt.title(r'Joint Posterior Belief b($\theta$, $\beta$)')
 		plt.tick_params(length=0)
 		plt.show()
+		if save:
+			plt.savefig( save)
 		return
