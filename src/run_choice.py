@@ -3,6 +3,7 @@
 import sys, os
 import numpy as np
 
+from utils.openrave_utils import *
 from env.choice_mdp import ChoiceMDP
 from env.opt_human import OptHuman
 
@@ -17,7 +18,7 @@ class RunChoice(object):
 		"""Initialize parameters for this simulation."""
 		#--- ARGUMENTS --- (TODO: yaml later)
 
-		num_rounds = 1
+		num_rounds = 10
 		model_filename = "jaco_dynamics"
 		feat_list = ["efficiency", "table", "laptop"]
 		max_iter = 50
@@ -36,13 +37,15 @@ class RunChoice(object):
 					 'weight_vals': [0.0, 0.5, 1.0], # Per feature theta options.
 					 'FEAT_RANGE': {'table':1.0, 'coffee':1.0, 'laptop':1.6, 'human':1.6, 'efficiency':0.01},
 					 }
-		feat_weights = [1.0,1.0,0.0]
+		# feat_weights = [1.0, 1.0, 0.0]
+		feat_weights = [1.0, 1.0, 0.0]
 
-		#--- Initialize Parameters ---#
-		start = np.array(start)
-		goal = np.array(goal)
+		#--- Initialize parameters ---#
+		start = np.array(start) * math.pi / 180.0
+		goal = np.array(goal) * math.pi / 180.0
+		# convert to radians?
 		self.num_rounds = num_rounds
-
+		self.control_idx = control_idx
 
 		self.cmdp = ChoiceMDP(model_filename=model_filename, object_centers_dict=object_centers_dict, control_idx=control_idx, feat_list=feat_list, constants=constants)
 		envs = self.cmdp.envs
@@ -50,8 +53,6 @@ class RunChoice(object):
 
 		self.human = OptHuman(feat_list=feat_list, max_iter=max_iter, num_waypts=num_waypts, environments=envs, start=start, goal=goal, goal_pose=goal_pose, T=T, timestep=timestep, weights=feat_weights, seed=None)
 		self.P_bt = self.initial_belief()
-
-		print('num', self.num_envs)
 
 	def initial_belief(self):
 		return self.cmdp.learners[0].P_bt
@@ -62,19 +63,21 @@ class RunChoice(object):
 		beliefs = [self.P_bt]
 		for i in np.arange(self.num_rounds):
 			print('ITERATION ', i)
-			# make sure chosen env is correct
-			# try plotting the traj given
-			# make sure the learner is the correct learner
-
 
 			env, env_idx, learner = self.cmdp.choose_env(self.P_bt)
 			xi_d = self.human.give_demo(env_idx)
+
+			plotTraj(env.env, env.robot, env.bodies, xi_d[0].waypts, size=0.015,color=[0, 0, 1])
+			plotCupTraj(env.env, env.robot, env.bodies, [xi_d[0].waypts[-1]], color=[0,1,0])
+
 			new_belief = learner.learn_posterior(trajs=xi_d, P_bt=self.P_bt)
 			self.P_bt = new_belief
 			beliefs.append(self.P_bt)
 
 		beliefs = np.array(beliefs).reshape((self.num_rounds + 1, 19))
-		learner.visualize_posterior(beliefs, save='control_env0')
+		print 'BELIEFS OVER TIME: ', beliefs
+		title_suffix = 'control, ENV {}'.format(str(self.control_idx))
+		learner.visualize_stacked_posterior(beliefs, title=title_suffix)
 
 
 

@@ -71,6 +71,7 @@ class DemoInference(object):
 				raise Exception('Planner {} not implemented.'.format(planner_type))
 			
 			self.traj = [self.planner.replan(self.start, self.goal, self.goal_pose, self.weights, self.T, self.timestep)]
+			print 'TRAJ WAYPTS: ', self.traj[0].waypts
 			plotTraj(self.environment.env, self.environment.robot, self.environment.bodies, self.traj[0].waypts, size=0.015,color=[0, 0, 1])
 			plotCupTraj(self.environment.env, self.environment.robot, self.environment.bodies, [self.traj[0].waypts[-1]],color=[0,1,0])
 		else:
