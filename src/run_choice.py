@@ -18,7 +18,7 @@ class RunChoice(object):
 		"""Initialize parameters for this simulation."""
 		#--- ARGUMENTS --- (TODO: yaml later)
 
-		num_rounds = 1
+		num_rounds = 10
 		model_filename = "jaco_dynamics"
 		# feat_list = ["table", "human", "laptop"]
 		feat_list = ["efficiency", "human", "laptop"]

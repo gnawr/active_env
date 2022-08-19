@@ -89,7 +89,6 @@ class ChoiceMDP(object):
 
 					assert summed >= 0, 'Info gain must be positive'
 					assert not np.isnan(info_gain), 'Info gain miscalculation' 
-					break
 
 				info_gains.append(info_gain)
 
