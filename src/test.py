@@ -43,7 +43,9 @@ class DevTest(unittest.TestCase):
 								# [0.0, -0.55, 0.0]
 
 		# laptop_center_options = [[-0.4,-0.1,0.0]]						
-		laptop_center_options = [[-0.7929,-0.1,0.0]]
+		# laptop_center_options = [[-0.7929,-0.1,0.0]]
+		laptop_center_options = [[-1.0,-0.3,0.0]]
+
 		
 								
 		# laptop_center_options = [[-0.7929,-0.1,0.0],

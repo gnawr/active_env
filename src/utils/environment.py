@@ -12,20 +12,22 @@ class Environment(object):
 	This class creates an OpenRave environment and contains all the
 	functionality needed for custom features and constraints.
 	"""
-	def __init__(self, model_filename, object_centers):
+	def __init__(self, model_filename, object_centers, show=True):
 		# ---- Create environment ---- #
-		self.env, self.robot = initialize(model_filename)
+		self.env, self.robot = initialize(model_filename, show=show)
 
 		# Insert any objects you want into environment.
 		self.bodies = []
 		self.object_centers = object_centers
 
-		# Plot the table and table mount, and other desired objects.
-		plotTable(self.env)
-		plotTableMount(self.env,self.bodies)
-		plotLaptop(self.env,self.bodies,object_centers['LAPTOP_CENTER'])
-		plotCabinet(self.env)
-		plotSphere(self.env,self.bodies,object_centers['HUMAN_CENTER'], 0.015)
+		self.show = show
+		if self.show:
+			# Plot the table and table mount, and other desired objects.
+			plotTable(self.env)
+			plotTableMount(self.env,self.bodies)
+			plotLaptop(self.env,self.bodies,object_centers['LAPTOP_CENTER'])
+			plotCabinet(self.env)
+			plotSphere(self.env,self.bodies,object_centers['HUMAN_CENTER'], 0.015)
 
 	# ---- Custom environmental features ---- #
 	def featurize(self, waypts, feat_list):

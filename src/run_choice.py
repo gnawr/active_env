@@ -18,9 +18,11 @@ class RunChoice(object):
 		"""Initialize parameters for this simulation."""
 		#--- ARGUMENTS --- (TODO: yaml later)
 
-		num_rounds = 10
+		num_rounds = 1
 		model_filename = "jaco_dynamics"
-		feat_list = ["efficiency", "table", "laptop"]
+		feat_list = ["efficiency", "human", "laptop"]
+		# feat_list = ["efficiency", "table", "laptop"]
+
 		max_iter = 50
 		num_waypts = 5
 		start = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 310.8]
@@ -46,6 +48,7 @@ class RunChoice(object):
 		# convert to radians?
 		self.num_rounds = num_rounds
 		self.control_idx = control_idx
+		self.is_control = control_idx != -1
 
 		self.cmdp = ChoiceMDP(model_filename=model_filename, object_centers_dict=object_centers_dict, control_idx=control_idx, feat_list=feat_list, constants=constants)
 		envs = self.cmdp.envs
@@ -67,7 +70,8 @@ class RunChoice(object):
 			env, env_idx, learner = self.cmdp.choose_env(self.P_bt)
 			xi_d = self.human.give_demo(env_idx)
 
-			plotTraj(env.env, env.robot, env.bodies, xi_d[0].waypts, size=0.015,color=[0, 0, 1])
+			# if self.is_control:
+			plotTraj(env.env, env.robot, env.bodies, xi_d[0].waypts, size=0.015,color=[0, 0.6, 0.6])
 			plotCupTraj(env.env, env.robot, env.bodies, [xi_d[0].waypts[-1]], color=[0,1,0])
 
 			new_belief = learner.learn_posterior(trajs=xi_d, P_bt=self.P_bt)
@@ -82,7 +86,11 @@ class RunChoice(object):
 
 
 if __name__ == "__main__":
+	# #--- Run controls --- #
+	# control_idx = 1
+	# simulation = RunChoice(control_idx=control_idx)
+	# simulation.run()
 
-	control_idx = 0
-	simulation = RunChoice(control_idx=control_idx)
+	# --- Run experiment --- #
+	simulation = RunChoice(control_idx=-1)
 	simulation.run()

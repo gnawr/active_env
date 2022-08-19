@@ -48,6 +48,7 @@ class DemoLearner(object):
 			Phi_rand = np.array([sum(x)/self.feat_range[i] for i,x in enumerate(rand_features)])
 			self.Phi_rands.append(Phi_rand)
 
+
 	def calc_obs_model(self, trajs):
 		new_features = [np.sum(self.environment.featurize(traj.waypts, self.feat_list), axis=1) for traj in trajs]
 		Phi_H = np.array(np.sum(np.matrix(new_features), axis=0) / self.feat_range).T
@@ -140,7 +141,7 @@ class DemoLearner(object):
 	def visualize_stacked_posterior(self, beliefs, title=''):
 		matplotlib.rcParams['font.sans-serif'] = "Arial"
 		matplotlib.rcParams['font.family'] = "Times New Roman"
-		matplotlib.rcParams.update({'font.size': 15})
+		matplotlib.rcParams.update({'font.size': 10})
 
 
 		print(beliefs.shape)
