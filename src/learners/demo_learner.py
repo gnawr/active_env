@@ -50,7 +50,11 @@ class DemoLearner(object):
 
 
 	def calc_obs_model(self, trajs):
-		new_features = [np.sum(self.environment.featurize(traj.waypts, self.feat_list), axis=1) for traj in trajs]
+		if isinstance(trajs[0], np.ndarray):
+			new_features = [np.sum(self.environment.featurize(traj, self.feat_list), axis=1) for traj in trajs]
+		else: 
+			new_features = [np.sum(self.environment.featurize(traj.waypts, self.feat_list), axis=1) for traj in trajs]
+			
 		Phi_H = np.array(np.sum(np.matrix(new_features), axis=0) / self.feat_range).T
 		print "Phi_H: ", Phi_H
 
@@ -58,7 +62,7 @@ class DemoLearner(object):
 		num_trajs = len(self.traj_rand.keys())
 		P_xi = np.zeros((self.num_betas, self.num_weights))
 		for (weight_i, weight) in enumerate(self.weights_list):
-			print "Initiating inference with the following weights: ", weight
+			# print "Initiating inference with the following weights: ", weight
 			for (beta_i, beta) in enumerate(self.betas_list):
 				# Compute -beta*(weight^T*Phi(xi_H))
 				numerator = -beta * np.dot(weight, Phi_H)
@@ -82,6 +86,7 @@ class DemoLearner(object):
 				# Get P(xi_H | beta, weight) by dividing them
 				P_xi[beta_i][weight_i] = np.exp(numerator - denom * len(trajs))
 
+		print P_xi, sum(sum(P_xi))
 		P_obs = P_xi / sum(sum(P_xi))
 		return P_obs
 
@@ -138,7 +143,7 @@ class DemoLearner(object):
 		plt.tick_params(length=0)
 		plt.show()
 
-	def visualize_stacked_posterior(self, beliefs, title=''):
+	def visualize_stacked_posterior(self, beliefs, title='', save = ''):
 		matplotlib.rcParams['font.sans-serif'] = "Arial"
 		matplotlib.rcParams['font.family'] = "Times New Roman"
 		matplotlib.rcParams.update({'font.size': 10})
@@ -156,6 +161,8 @@ class DemoLearner(object):
 		plt.title(r'Belief b($\theta$) for ' + title)
 		plt.tick_params(length=0)
 		
-		plt.show()
+		# plt.show()
+		if save:
+			plt.savefig('data/exp081922')
 		
 		return

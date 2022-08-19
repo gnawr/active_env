@@ -20,7 +20,9 @@ class RunChoice(object):
 
 		num_rounds = 1
 		model_filename = "jaco_dynamics"
+		# feat_list = ["table", "human", "laptop"]
 		feat_list = ["efficiency", "human", "laptop"]
+
 		# feat_list = ["efficiency", "table", "laptop"]
 
 		max_iter = 50
@@ -35,12 +37,12 @@ class RunChoice(object):
 							   }
 
 		constants = {'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
-					 'betas_list': [100.0],
+					 'betas_list': [10.0],
 					 'weight_vals': [0.0, 0.5, 1.0], # Per feature theta options.
 					 'FEAT_RANGE': {'table':1.0, 'coffee':1.0, 'laptop':1.6, 'human':1.6, 'efficiency':0.01},
 					 }
+		feat_weights = [0.0, 1.0, 1.0]
 		# feat_weights = [1.0, 1.0, 0.0]
-		feat_weights = [1.0, 1.0, 0.0]
 
 		#--- Initialize parameters ---#
 		start = np.array(start) * math.pi / 180.0
@@ -64,10 +66,12 @@ class RunChoice(object):
 	def run(self):
 		"""Run the simulation."""
 		beliefs = [self.P_bt]
+		envs_chosen = []
+		info_gain_options = []
 		for i in np.arange(self.num_rounds):
 			print('ITERATION ', i)
 
-			env, env_idx, learner = self.cmdp.choose_env(self.P_bt)
+			env, env_idx, learner, info_gains = self.cmdp.choose_env(self.P_bt)
 			xi_d = self.human.give_demo(env_idx)
 
 			# if self.is_control:
@@ -77,11 +81,24 @@ class RunChoice(object):
 			new_belief = learner.learn_posterior(trajs=xi_d, P_bt=self.P_bt)
 			self.P_bt = new_belief
 			beliefs.append(self.P_bt)
+			envs_chosen.append(env_idx)
+			info_gain_options.append(info_gains)
 
 		beliefs = np.array(beliefs).reshape((self.num_rounds + 1, 19))
 		print 'BELIEFS OVER TIME: ', beliefs
-		title_suffix = 'control, ENV {}'.format(str(self.control_idx))
-		learner.visualize_stacked_posterior(beliefs, title=title_suffix)
+		print 'ENVS CHOSEN: ', envs_chosen
+
+		if info_gains: print 'INFO GAIN OPTIONS :', info_gain_options
+
+		if self.is_control:
+			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
+		else:
+			title_suffix = 'experiment, 2 choices'
+
+		learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=True)
+
+		file_path = os.path.join(os.getcwd(), 'data/exp_081922_metadata.npz')
+		np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
 
 
 
