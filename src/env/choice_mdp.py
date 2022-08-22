@@ -87,7 +87,7 @@ class ChoiceMDP(object):
 					print 'SUMMED:    ', summed
 					print 'info gain (should be float): ', info_gain
 
-					assert summed >= 0, 'Info gain must be positive'
+					# assert summed >= 0, 'Info gain must be positive'
 					assert not np.isnan(info_gain), 'Info gain miscalculation' 
 
 				info_gains.append(info_gain)

@@ -161,8 +161,9 @@ class DemoLearner(object):
 		plt.title(r'Belief b($\theta$) for ' + title)
 		plt.tick_params(length=0)
 		
-		# plt.show()
 		if save:
-			plt.savefig('data/exp081922')
+			plt.savefig(save)
+		else:
+			plt.show()
 		
 		return

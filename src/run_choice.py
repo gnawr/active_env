@@ -41,8 +41,8 @@ class RunChoice(object):
 					 'weight_vals': [0.0, 0.5, 1.0], # Per feature theta options.
 					 'FEAT_RANGE': {'table':1.0, 'coffee':1.0, 'laptop':1.6, 'human':1.6, 'efficiency':0.01},
 					 }
-		feat_weights = [0.0, 1.0, 1.0]
-		# feat_weights = [1.0, 1.0, 0.0]
+		# feat_weights = [0.0, 1.0, 1.0]
+		feat_weights = [1.0, 0.0, 1.0]
 
 		#--- Initialize parameters ---#
 		start = np.array(start) * math.pi / 180.0
@@ -95,10 +95,12 @@ class RunChoice(object):
 		else:
 			title_suffix = 'experiment, 2 choices'
 
-		learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=True)
-
-		file_path = os.path.join(os.getcwd(), 'data/exp_081922_metadata.npz')
+		file_path = os.path.join(os.getcwd(), 'data/exp_101_metadata.npz')
 		np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
+
+		learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_101')
+
+		
 
 
 
