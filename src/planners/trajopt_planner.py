@@ -164,7 +164,7 @@ class TrajoptPlanner(object):
 			"costs": [
 			{
 				"type": "joint_vel",
-				"params": {"coeffs": [1.0]}
+				"params": {"coeffs": [1.0]} # changed
 			}
 			],
 			"constraints": constraint,

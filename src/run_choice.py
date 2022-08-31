@@ -33,7 +33,16 @@ class RunChoice(object):
 		T = 20.0
 		timestep = 0.5 
 		object_centers_dict = {0: {'HUMAN_CENTER': [-0.6,-0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.1,0.0]},
-							   1: {'HUMAN_CENTER': [-0.6,0.55,0.0], 'LAPTOP_CENTER': [-0.4,-0.1,0.0]}
+							   1: {'HUMAN_CENTER': [-0.6,0.55,0.0], 'LAPTOP_CENTER': [-0.4,-0.1,0.0]},
+							   # 2: {'HUMAN_CENTER': [-0.9,-0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
+							   # 3: {'HUMAN_CENTER': [-0.3, 0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
+							   }
+
+		object_centers_dict = {
+							   0: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
+							   1: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
+							   2: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
+							   3: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
 							   }
 
 		constants = {'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
@@ -45,6 +54,8 @@ class RunChoice(object):
 		feat_weights = [1.0, 0.0, 1.0]
 
 		#--- Initialize parameters ---#
+		self.feat_weights = feat_weights
+		self.constants = constants
 		start = np.array(start) * math.pi / 180.0
 		goal = np.array(goal) * math.pi / 180.0
 		# convert to radians?
@@ -60,7 +71,15 @@ class RunChoice(object):
 		self.P_bt = self.initial_belief()
 
 	def initial_belief(self):
-		return self.cmdp.learners[0].P_bt
+		if self.feat_weights == [1.0, 0.0, 1.0]:
+			prior = self.cmdp.learners[0].P_bt
+			# prior[0][2] *= 2
+			# prior[0][5] *= 2
+			# prior[0][18] *= 10
+			# prior = prior / np.sum(prior)
+			return prior			
+		else: #uninformed prior
+			return self.cmdp.learners[0].P_bt
 
 
 	def run(self):
@@ -72,7 +91,8 @@ class RunChoice(object):
 			print('ITERATION ', i)
 
 			env, env_idx, learner, info_gains = self.cmdp.choose_env(self.P_bt)
-			xi_d = self.human.give_demo(env_idx)
+			# xi_d = self.human.give_demo(env_idx) # TODO: FIX LATER
+			
 
 			# if self.is_control:
 			plotTraj(env.env, env.robot, env.bodies, xi_d[0].waypts, size=0.015,color=[0, 0.6, 0.6])
@@ -95,21 +115,24 @@ class RunChoice(object):
 		else:
 			title_suffix = 'experiment, 2 choices'
 
-		file_path = os.path.join(os.getcwd(), 'data/exp_101_metadata.npz')
-		np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
+		# file_path = os.path.join(os.getcwd(), 'data/exp_101_0826_metadata.npz')
+		# np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
 
-		learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_101')
+		learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='')
+
+		# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_101_0826')
 
 		
 
 
 
 if __name__ == "__main__":
-	# #--- Run controls --- #
-	# control_idx = 1
-	# simulation = RunChoice(control_idx=control_idx)
-	# simulation.run()
+	#--- Run controls --- #
+	control_idx = 3
 
-	# --- Run experiment --- #
-	simulation = RunChoice(control_idx=-1)
+	simulation = RunChoice(control_idx=control_idx)
 	simulation.run()
+
+	# #--- Run experiment --- #
+	# simulation = RunChoice(control_idx=-1)
+	# simulation.run()
