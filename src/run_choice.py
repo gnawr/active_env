@@ -21,8 +21,8 @@ class RunChoice(object):
 		num_rounds = 10
 		model_filename = "jaco_dynamics"
 		# feat_list = ["table", "human", "laptop"]
-		feat_list = ["efficiency", "human", "laptop"]
-
+		# feat_list = ["efficiency", "human", "laptop"]
+		feat_list = ["human", "table", "laptop"]
 		# feat_list = ["efficiency", "table", "laptop"]
 
 		max_iter = 50

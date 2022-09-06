@@ -217,7 +217,42 @@ class DevTest(unittest.TestCase):
 		print 'FEAT MAX: ', np.max(features, axis=0)
 		print 'FEAT MIN: ', np.min(features, axis=0)
 
-		
-if __name__ == '__main__':
-	unittest.main()
+	def test_obs_model(self):
+		model_filename = 'jaco_dynamics'
+		human_center = [-0.6,0.55,0.0]
+		laptop_center = [-0.7929,-0.1,0.0]
+		object_centers = {'HUMAN_CENTER': human_center, 'LAPTOP_CENTER': laptop_center}
+		feat_list = ["efficiency", "human", "laptop"]
+		constants = {'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
+					 'betas_list': [10.0],
+					 'weight_vals': [0.0, 0.5, 1.0], # Per feature theta options.
+					 'FEAT_RANGE': {'table':0.98, 'coffee':1.0, 'laptop':0.4, 'human':0.4, 'efficiency':0.22},
+					 }
+		FEAT_RANGE = {'table':0.98, 'coffee':1.0, 'laptop':0.4, 'human':0.4, 'efficiency':0.22}
 
+		
+		env = Environment(model_filename, object_centers)
+		learner = DemoLearner(feat_list, env, constants)
+		true_weight = learner.weights_list[-1] # 1, 0, 1
+
+
+		features = np.array(learner.Phi_rands)
+		self.assertTrue((np.max(features, axis=0) <= 1).all())
+		self.assertTrue((np.min(features, axis=0) >= 0).all())
+
+		# Get a demo to test obs model
+		max_iter = 50
+		num_waypts = 5
+		start = np.array([104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 310.8]) * math.pi / 180.0
+		goal = np.array([210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0]) * math.pi / 180.0
+		goal_pose = None
+		T = 20.0
+		timestep = 0.5 
+
+		planner = TrajoptPlanner(feat_list, max_iter, num_waypts, env)
+		planned_traj = [planner.replan(start, goal, goal_pose, true_weight, T, timestep)]
+		P_obs = learner.calc_obs_model(planned_traj)
+
+if __name__ == '__main__':
+    unittest.main()
+		

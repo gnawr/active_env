@@ -17,8 +17,8 @@ class DemoLearner(object):
 		self.num_features = len(self.feat_list)
 		self.environment = environment
 
-		FEAT_RANGE = constants["FEAT_RANGE"]
-		self.feat_range = [FEAT_RANGE[self.feat_list[feat]] for feat in range(self.num_features)]
+		# FEAT_RANGE = constants["FEAT_RANGE"]
+		# self.feat_range = [FEAT_RANGE[self.feat_list[feat]] for feat in range(self.num_features)]
 
 		# Set up discretization of theta and beta space.
 		self.betas_list = constants["betas_list"]
@@ -45,9 +45,20 @@ class DemoLearner(object):
 		for rand_i, traj_str in enumerate(self.traj_rand.keys()):
 			curr_traj = np.array(ast.literal_eval(traj_str))
 			rand_features = self.environment.featurize(curr_traj, self.feat_list)
-			Phi_rand = np.array([sum(x)/self.feat_range[i] for i,x in enumerate(rand_features)])
+			# Phi_rand = np.array([sum(x)/self.feat_range[i] for i,x in enumerate(rand_features)])
+
+			Phi_rand = np.array([sum(x) for i,x in enumerate(rand_features)])
 			self.Phi_rands.append(Phi_rand)
 
+		self.Phi_rands = np.array(self.Phi_rands)
+
+		# Create scaling coeffs
+		self.max_features = np.max(self.Phi_rands, axis=0)
+		self.min_features = np.min(self.Phi_rands, axis=0)
+		self.scaling_coeffs = [{"min": self.min_features[i], "max": self.max_features[i]} for i in np.arange(self.num_features)]
+
+		# Todo apply scaling coeffs
+		self.Phi_rands = (self.Phi_rands - self.min_features) / (self.max_features - self.min_features)
 
 	def calc_obs_model(self, trajs):
 		if isinstance(trajs[0], np.ndarray):
@@ -55,7 +66,10 @@ class DemoLearner(object):
 		else: 
 			new_features = [np.sum(self.environment.featurize(traj.waypts, self.feat_list), axis=1) for traj in trajs]
 			
-		Phi_H = np.array(np.sum(np.matrix(new_features), axis=0) / self.feat_range).T
+		# Apply scaling coefficients
+		summed = np.array(np.sum(np.matrix(new_features), axis=0))
+		Phi_H = (summed - self.min_features) / (self.max_features - self.min_features)
+		Phi_H = Phi_H.T
 		print "Phi_H: ", Phi_H
 
 		# Now compute probabilities for each beta and theta pair.
