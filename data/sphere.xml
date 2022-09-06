@@ -1,0 +1,16 @@
+
+<KinBody name="sphere">
+ <!--  <RotationAxis>1 0 0 90</RotationAxis> -->
+  <Body name = "spbase" type="static">
+    <Geom type="sphere">
+      <Radius>0.4</Radius>
+      <Translation>-0.5 0.55 0.0</Translation>
+      <Transparency> 0.5 </Transparency>
+    </Geom>      
+    <Geom type="sphere">
+      <Radius>0.4</Radius>
+      <Translation>-0.6 0.1 0.0</Translation>
+      <Transparency> 0.5 </Transparency>
+    </Geom>      
+  </Body>
+</KinBody> 

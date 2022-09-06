@@ -32,12 +32,13 @@ class RunChoice(object):
 		goal_pose = None
 		T = 20.0
 		timestep = 0.5 
-		object_centers_dict = {0: {'HUMAN_CENTER': [-0.6,-0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.1,0.0]},
-							   1: {'HUMAN_CENTER': [-0.6,0.55,0.0], 'LAPTOP_CENTER': [-0.4,-0.1,0.0]},
-							   # 2: {'HUMAN_CENTER': [-0.9,-0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-							   # 3: {'HUMAN_CENTER': [-0.3, 0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-							   }
+		# object_centers_dict = {0: {'HUMAN_CENTER': [-0.6,-0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.1,0.0]},
+		# 					   1: {'HUMAN_CENTER': [-0.6,0.55,0.0], 'LAPTOP_CENTER': [-0.4,-0.1,0.0]},
+		# 					   # 2: {'HUMAN_CENTER': [-0.9,-0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
+		# 					   # 3: {'HUMAN_CENTER': [-0.3, 0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
+		# 					   }
 
+		# Sanity check environments
 		object_centers_dict = {
 							   0: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
 							   1: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
@@ -71,15 +72,15 @@ class RunChoice(object):
 		self.P_bt = self.initial_belief()
 
 	def initial_belief(self):
-		if self.feat_weights == [1.0, 0.0, 1.0]:
-			prior = self.cmdp.learners[0].P_bt
-			# prior[0][2] *= 2
-			# prior[0][5] *= 2
-			# prior[0][18] *= 10
-			# prior = prior / np.sum(prior)
-			return prior			
-		else: #uninformed prior
-			return self.cmdp.learners[0].P_bt
+		# Playing with informed prior
+		# if self.feat_weights == [1.0, 0.0, 1.0]:
+		# 	prior = self.cmdp.learners[0].P_bt
+		# 	# prior[0][2] *= 2
+		# 	# prior[0][5] *= 2
+		# 	# prior[0][18] *= 10
+		# 	# prior = prior / np.sum(prior)
+		# 	return prior			
+		return self.cmdp.learners[0].P_bt
 
 
 	def run(self):
@@ -91,8 +92,12 @@ class RunChoice(object):
 			print('ITERATION ', i)
 
 			env, env_idx, learner, info_gains = self.cmdp.choose_env(self.P_bt)
+
+			# # Use TrajOpt for giving a demonstration
 			# xi_d = self.human.give_demo(env_idx) # TODO: FIX LATER
-			
+
+			# Use the best trajectory from the denominator as the demonstration
+			xi_d = self.cmdp.give_best_traj(env_idx, theta=self.feat_weights)
 
 			# if self.is_control:
 			plotTraj(env.env, env.robot, env.bodies, xi_d[0].waypts, size=0.015,color=[0, 0.6, 0.6])
@@ -128,7 +133,7 @@ class RunChoice(object):
 
 if __name__ == "__main__":
 	#--- Run controls --- #
-	control_idx = 3
+	control_idx = 1
 
 	simulation = RunChoice(control_idx=control_idx)
 	simulation.run()
