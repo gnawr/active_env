@@ -9,7 +9,7 @@
     </Geom>      
     <Geom type="sphere">
       <Radius>0.4</Radius>
-      <Translation>-0.6 0.1 0.0</Translation>
+      <Translation>-0.6, 0.1 0.0</Translation>
       <Transparency> 0.5 </Transparency>
     </Geom>      
   </Body>

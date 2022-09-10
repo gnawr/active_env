@@ -142,60 +142,6 @@ class DevTest(unittest.TestCase):
 			plotTraj(env.env, env.robot, env.bodies, curr_traj, size=0.01,color=color)
 		raw_input("Visualizing all trajectories. Press Enter to continue...")
 
-	# def test_demo(self):
-
-	# 	model_filename = 'jaco_dynamics'
-	# 	object_centers = {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]}
-	# 	feat_list = ["human", "table", "laptop"]
-	# 	constants = {'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
-	# 				 'betas_list': [10.0],
-	# 				 'weight_vals': [0.0, 0.5, 1.0], # Per feature theta options.
-	# 				 'FEAT_RANGE': {'table':1.0, 'coffee':1.0, 'laptop':0.4, 'human':0.4, 'efficiency':0.01},
-	# 				 }
-	# 	FEAT_RANGE = {'table':1.0, 'coffee':1.0, 'laptop':0.4, 'human':0.4, 'efficiency':0.01}
-		
-	# 	env = Environment(model_filename, object_centers)
-	# 	learner = DemoLearner(feat_list, env, constants)
-	# 	true_weight = learner.weights_list[-1]
-
-
-	# 	# Trajectory paths.
-	# 	here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../'))
-	# 	traj_rand = pickle.load(open(here + "/data/traj_sets/traj_rand_merged_H.p", "rb" ))
-
-	# 	# Featurize each traj
-	# 	Phi_rands = []
-	# 	feat_range = [FEAT_RANGE[feat_list[feat]] for feat in range(3)]
-	# 	for rand_i, traj_str in enumerate(traj_rand.keys()):
-	# 		curr_traj = np.array(ast.literal_eval(traj_str))
-			
-	# 		rand_features = env.featurize(curr_traj, feat_list)
-	# 		Phi_rand = np.array([sum(x)/feat_range[i] for i,x in enumerate(rand_features)])
-	# 		Phi_rands.append(Phi_rand)
-
-	# 	# Plot best traj
-	# 	rewards = np.dot(np.array(Phi_rands), true_weight)
-	# 	print "DEBUG: rewards shape should be ~1400", rewards.shape 
-	# 	best_traj_idx = np.argmax(rewards)
-	# 	best_traj_str = traj_rand.keys()[best_traj_idx]
-	# 	best_traj = np.array(ast.literal_eval(best_traj_str))
-	# 	plotTraj(env.env, env.robot, env.bodies, best_traj, size=0.015, color=[0, 0, 1])
-
-	# 	# Plot demo
-	# 	max_iter = 50
-	# 	num_waypts = 5
-	# 	start = np.array([104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 310.8]) * math.pi / 180.0
-	# 	goal = np.array([210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0]) * math.pi / 180.0
-	# 	goal_pose = None
-	# 	T = 20.0
-	# 	timestep = 0.5 
-
-	# 	planner = TrajoptPlanner(feat_list, max_iter, num_waypts, env)
-	# 	planned_traj = [planner.replan(start, goal, goal_pose, true_weight, T, timestep)]
-	# 	plotTraj(env.env, env.robot, env.bodies, planned_traj[0].waypts, size=0.015,color=[1, 0, 0])
-
-
-	# 	raw_input("Visualizing best traj in blue, trajopt in red. Press Enter to continue...")
 
 	def test_demos(self):
 		num_rounds = 10
@@ -215,7 +161,7 @@ class DevTest(unittest.TestCase):
 		object_centers_dict = {
 							   0: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
 							   1: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-							   2: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
+							   2: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3, 0.0]},
 							   3: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
 							   }
 
@@ -247,8 +193,8 @@ class DevTest(unittest.TestCase):
 		best_denom_demo = cmdp.give_best_traj(0, theta=feat_weights)
 		plotTraj(env.env, env.robot, env.bodies, best_denom_demo[0].waypts, size=0.015, color=[0, 0, 1])
 
+		# Trajopt demonstration
 		learner = cmdp.learners[0]
-
 		traj_opt_demo = human.give_demo(0)
 		traj_opt_features = np.array(env.featurize(traj_opt_demo[0].waypts, feat_list))
 		traj_opt_features = np.sum(traj_opt_features, axis=1)

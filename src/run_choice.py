@@ -97,10 +97,12 @@ class RunChoice(object):
 			# xi_d = self.human.give_demo(env_idx) # TODO: FIX LATER
 
 			# Use the best trajectory from the denominator as the demonstration
-			xi_d = self.cmdp.give_best_traj(env_idx, theta=self.feat_weights)
+			xi_d = self.cmdp.give_best_traj(env_idx, theta=self.feat_weights, num_demos=5)
 
 			# if self.is_control:
-			plotTraj(env.env, env.robot, env.bodies, xi_d[0].waypts, size=0.015,color=[0, 0.6, 0.6])
+			for traj in xi_d:
+				color = np.random.rand(3)
+				plotTraj(env.env, env.robot, env.bodies, traj.waypts, size=0.015, color=color)
 			plotCupTraj(env.env, env.robot, env.bodies, [xi_d[0].waypts[-1]], color=[0,1,0])
 
 			new_belief = learner.learn_posterior(trajs=xi_d, P_bt=self.P_bt)
@@ -111,33 +113,35 @@ class RunChoice(object):
 
 		beliefs = np.array(beliefs).reshape((self.num_rounds + 1, 19))
 		print 'BELIEFS OVER TIME: ', beliefs
-		print 'ENVS CHOSEN: ', envs_chosen
+		if not self.is_control:
+			print 'ENVS CHOSEN: ', envs_chosen
 
 		if info_gains: print 'INFO GAIN OPTIONS :', info_gain_options
 
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
 		else:
-			title_suffix = 'experiment, 2 choices'
+			title_suffix = 'experiment, 4 choices'
 
-		# file_path = os.path.join(os.getcwd(), 'data/exp_101_0826_metadata.npz')
-		# np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
+		file_path = os.path.join(os.getcwd(), 'data/exp_cost_0909_metadata.npz')
+		np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
 
-		learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='')
+		# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='')
 
-		# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_101_0826')
+		learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_0909_5demo')
 
 		
 
 
 
 if __name__ == "__main__":
-	#--- Run controls --- #
-	control_idx = 1
+	# # #--- Run controls --- #
+	# control_idx = 3
 
-	simulation = RunChoice(control_idx=control_idx)
-	simulation.run()
-
-	# #--- Run experiment --- #
-	# simulation = RunChoice(control_idx=-1)
+	# simulation = RunChoice(control_idx=control_idx)
 	# simulation.run()
+
+
+	#--- Run experiment --- #
+	simulation = RunChoice(control_idx=-1)
+	simulation.run()

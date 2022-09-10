@@ -103,24 +103,32 @@ class ChoiceMDP(object):
 
 			return self.envs[best_env_idx], best_env_idx, self.learners[best_env_idx], info_gains
 
-	def give_best_traj(self, env_idx, theta, T=20.0):
+	def give_best_traj(self, env_idx, theta, num_demos=1, T=20.0):
 		# Give the best trajectory from the denominator trajs under this theta
 		env = self.envs[env_idx]
 		learner = self.learners[env_idx]
 		theta = np.array(theta) / np.linalg.norm(np.array(theta))
 
 		rewards = np.dot(np.array(learner.Phi_rands), theta)
-		best_traj_idx = np.argmax(rewards)
-		print 'BEST TRAJ REWARD: ', rewards[best_traj_idx]
-		print 'features for best traj: ', learner.Phi_rands[best_traj_idx]
-		best_traj_str = learner.traj_rand.keys()[best_traj_idx]
-		best_traj_waypts = np.array(ast.literal_eval(best_traj_str))
-		print 'BEST TRAJ LENGTH: ', best_traj_waypts.shape
+		# best_traj_idx = np.argmin(rewards)
+		best_traj_idxs = rewards.argsort()[:num_demos]
+		print 'BEST TRAJ INDICES: ', best_traj_idxs
+
+		best_trajs = []
+
+		for best_traj_idx in best_traj_idxs:
+
+			print 'BEST TRAJ REWARD: ', rewards[best_traj_idx]
+			print 'features for best traj: ', learner.Phi_rands[best_traj_idx]
+			best_traj_str = learner.traj_rand.keys()[best_traj_idx]
+			best_traj_waypts = np.array(ast.literal_eval(best_traj_str))
+			print 'BEST TRAJ LENGTH: ', best_traj_waypts.shape
 
 
-		waypts_time = np.linspace(0.0, T, best_traj_waypts.shape[0])
-		traj = Trajectory(best_traj_waypts, waypts_time)
-		return [traj]
+			waypts_time = np.linspace(0.0, T, best_traj_waypts.shape[0])
+			traj = Trajectory(best_traj_waypts, waypts_time)
+			best_trajs.append(traj)
+		return best_trajs
 
 
 
