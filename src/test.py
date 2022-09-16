@@ -61,8 +61,8 @@ class DevTest(unittest.TestCase):
 		# laptop_center_options = [[-0.7929,-0.1,0.0],
 								 # [-0.7929,-0.2,0.0]]
 		object_centers_dict = {
-							   0: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
-							   # 1: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
+							   # 0: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
+							   1: {'HUMAN_CENTER': [-0.7, -0.55,0.0], 'LAPTOP_CENTER': [-1.05, -0.1, 0.0]},
 							   # 2: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
 							   # 3: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
 							   }
@@ -71,22 +71,17 @@ class DevTest(unittest.TestCase):
 		for object_centers in object_centers_dict.values():
 				env = Environment(model_filename, object_centers)
 				
-				#sphere
-				objects_path = '../data'
+				# #sphere
+				# objects_path = '../data'
 				
-				env.env.Load('{:s}/sphere.xml'.format(objects_path))
-				mug = env.env.GetKinBody('sphere')
-				body = mug
-				body.SetName("pt"+str(len(env.bodies)))
-				env.env.Add(body, True)
-				env.bodies.append(body)
+				# env.env.Load('{:s}/sphere.xml'.format(objects_path))
+				# mug = env.env.GetKinBody('sphere')
+				# body = mug
+				# body.SetName("pt"+str(len(env.bodies)))
+				# env.env.Add(body, True)
+				# env.bodies.append(body)
 
-				# env.robot.SetDOFValues([math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, 0.,0.,0.])
-				# env.robot.SetDOFValues([283.13, 162.59, 0.0, 43.45, 265.25, 257.59, 288.29, 0.,0.,0.])
-				# env.robot.SetDOFValues([286.77, 100.91, 159.53, 77.13, 122.34, 109.7, 345.56, 0.,0.,0.])
-				# # env.robot.SetDOFValues([141.44, 88.25, 207.99, 126.77, -59.24, 133.23, 375.59, 0.,0.,0.])
-				# ee_xyz = manipToCartesian(env.robot, 0.0)
-				# plotSphere(env.env, [], ee_xyz, size=10, color=[0, 0, 1])
+				
 				raw_input("Press Enter to continue...")
 				env.kill_environment()
 

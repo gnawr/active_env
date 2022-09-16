@@ -164,11 +164,8 @@ if __name__ == "__main__":
 
 
 	#--- Run experiment --- #
-	start = time.time()
 	simulation = RunChoice(control_idx=-1)
 	simulation.run()
-	end = time.time()
-	print 'TIME FOR ENTIRE RUN: ', end - start
 
 	# #--- Print metadata --- #
 	# path = '../data/exp_cost_0908_metadata.npz'

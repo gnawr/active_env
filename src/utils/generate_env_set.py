@@ -18,8 +18,8 @@ def generate_random_env_set(feat_list, set_size):
 	"""Generate a random environment given the features in the feature list."""
 	human_regions = {'top side left': [[-0.2, -0.55, 0.0], [-0.7, -0.55, 0.0]],
 					 'top side right': [[-0.7, -0.55, 0.0], [-1.3, -0.55, 0.0]],
-					 'right side top': [[-1.3, -0.55, 0.0], [-1.3, 0.0, 0.0]],
-					 'right side bottom': [[-1.3, 0.0, 0.0], [-1.3, 0.55, 0.0]],
+					 'right side top': [[-1.3, 0.0, 0.0], [-1.3, -0.55, 0.0]],
+					 'right side bottom': [[-1.3, 0.55, 0.0], [-1.3, 0.0, 0.0]],
 					 'bottom side left': [[-0.2, 0.55, 0.0], [-0.7, 0.55, 0.0]],
 					 'bottom side right': [[-0.7, 0.55, 0.0], [-1.3, 0.55, 0.0]]
 					 }
@@ -29,3 +29,17 @@ def generate_random_env_set(feat_list, set_size):
 					  'bottom left quadrant': [[-0.3, 0.1, 0.0], [-0.675, -0.1, 0.0]],
 					  'bottom right quadrant': [[-0.675, 0.1, 0.0], [-1.05, -0.1, 0.0]]
 					  }
+	# Sample the parametrized objects
+	# sample from the set of object locations
+
+
+def sample_centers(regions):
+	"""Given a dict of regions, sample an object location within each region."""
+	centers = []
+	for region in regions.values():
+		bot_left_corner = region[0]
+		top_right_corner = region[1]
+		object_center = []
+		for coordinate in np.arange(3):
+			# sample a coordinate within the range of the region bounds
+			# TODO: 
