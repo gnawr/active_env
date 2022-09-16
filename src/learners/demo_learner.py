@@ -5,13 +5,14 @@ import pickle
 import matplotlib.pyplot as plt
 import matplotlib
 import ast
+import time
 
 class DemoLearner(object):
 	"""
 	This class performs demonstration inference given human trajectories.
 	"""
 
-	def __init__(self, feat_list, environment, constants):
+	def __init__(self, feat_list, environment, constants, precompute=False):
 		# ---- Important internal variables ---- #
 		self.feat_list = feat_list
 		self.num_features = len(self.feat_list)
@@ -60,7 +61,41 @@ class DemoLearner(object):
 		# Todo apply scaling coeffs
 		self.Phi_rands = (self.Phi_rands - self.min_features) / (self.max_features - self.min_features)
 
+		# Pre-compute the observation model. Might want to save this for later
+		# To get obs model for specific trajectory: self.full_obs_model[traj_index]
+		self.full_obs_model = []
+		if precompute:
+			start = time.time()
+			for traj_i, traj_str in enumerate(self.traj_rand.keys()):
+				curr_traj = np.array(ast.literal_eval(traj_str))
+				# get P(xi | theta)
+				obs_model = self.calc_obs_model([curr_traj])
+				# TODO: USE TRAJ_I ^
+				obs_model.reshape(self.num_weights)
+				self.full_obs_model.append(obs_model)
+			self.full_obs_model = np.array(self.full_obs_model)
+			end = time.time()
+			print 'Time to build obs model', end - start
+			print 'OBS MODEL SHAPE', self.full_obs_model.shape
+
+	def get_obs_model(self, traj_index):
+		if len(self.full_obs_model) > 0:
+			return self.full_obs_model[traj_index]
+		else:
+			# Get traj from traj_index
+			traj_str = self.traj_rand.keys()
+			traj = np.array(ast.literal_eval(traj_str))
+			return self.calc_obs_model([traj])
+
+
 	def calc_obs_model(self, trajs):
+		"""
+		Calculate the observation model P(xi|theta) for given demonstration trajectories.
+		Params:
+			- trajs [list]: list of Trajectory objects or waypoints
+		Returns:
+			- List of size len(weight_list), where each entry is P(xi | theta)
+		"""
 		if isinstance(trajs[0], np.ndarray):
 			new_features = [np.sum(self.environment.featurize(traj, self.feat_list), axis=1) for traj in trajs]
 		else: 
@@ -70,7 +105,7 @@ class DemoLearner(object):
 		summed = np.array(np.sum(np.matrix(new_features), axis=0))
 		Phi_H = (summed - self.min_features) / (self.max_features - self.min_features)
 		Phi_H = Phi_H.T
-		print "Phi_H: ", Phi_H
+		# print "Phi_H: ", Phi_H
 
 		# Now compute probabilities for each beta and theta pair.
 		num_trajs = len(self.traj_rand.keys())
@@ -100,7 +135,7 @@ class DemoLearner(object):
 				# Get P(xi_H | beta, weight) by dividing them
 				P_xi[beta_i][weight_i] = np.exp(numerator - denom * len(trajs))
 
-		print P_xi, sum(sum(P_xi))
+		# print P_xi, sum(sum(P_xi))
 		P_obs = P_xi / sum(sum(P_xi))
 		return P_obs
 

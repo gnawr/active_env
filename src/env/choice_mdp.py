@@ -27,7 +27,10 @@ class ChoiceMDP(object):
 		self.eps = 1e-100
 
 		# learners
-		self.learners = [DemoLearner(feat_list, env, constants) for env in self.envs]
+		if self.num_envs > 1:
+			self.learners = [DemoLearner(feat_list, env, constants, precompute=True) for env in self.envs]
+		else:
+			self.learners = [DemoLearner(feat_list, env, constants) for env in self.envs]
 
 	def gen_envs(self, control_idx, show):
 		"""Generate the environment options. """
@@ -68,7 +71,9 @@ class ChoiceMDP(object):
 				for traj_i, traj_str in enumerate(learner.traj_rand.keys()):
 					curr_traj = np.array(ast.literal_eval(traj_str))
 					# get P(xi | theta)
-					obs_model = learner.calc_obs_model([curr_traj])
+					# obs_model = learner.calc_obs_model([curr_traj])
+					obs_model = learner.get_obs_model(traj_i)
+					# TODO: USE TRAJ_I ^
 					obs_model.reshape(learner.num_weights)
 
 					# create the denominator
