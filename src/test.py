@@ -9,6 +9,7 @@ import ast
 
 from utils.openrave_utils import *
 from utils.environment import Environment
+from utils.generate_env_set import *
 from demo_inference import DemoInference
 from catkin.find_in_workspaces import find_in_workspaces
 from learners.demo_learner import DemoLearner
@@ -264,6 +265,12 @@ class DevTest(unittest.TestCase):
 		planner = TrajoptPlanner(feat_list, max_iter, num_waypts, env)
 		planned_traj = [planner.replan(start, goal, goal_pose, true_weight, T, timestep)]
 		P_obs = learner.calc_obs_model(planned_traj)
+
+	def test_random_env_gen(self):
+		feat_list = ["human", "table", "laptop"]
+		set_size = 10
+		object_centers = generate_random_env_set(feat_list, set_size)
+		print object_centers
 
 if __name__ == '__main__':
     unittest.main()
