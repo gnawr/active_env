@@ -1,4 +1,5 @@
 from utils.environment import Environment
+import numpy as np
 
 def generate_kl_env_set(feat_list, num_envs=20, set_size=10):
 	"""
@@ -83,8 +84,14 @@ def sample_centers(regions):
 		object_center = []
 		for coord_idx in np.arange(3):
 			# sample a coordinate within the range of the region bounds
-			lower_bound, upper_bound = [bot_left_corner[coord_idx], top_right_corner[coord_idx]].sort()
-			sampled_coord = np.random.uniform(lower_bound, upper_bound)
+			bounds = [bot_left_corner[coord_idx], top_right_corner[coord_idx]]
+                        bounds.sort()
+                        
+                        lower_bound, upper_bound = bounds
+                        print 'bot left', bot_left_corner
+                        print 'bot left corner type', type(bot_left_corner)
+                
+                        sampled_coord = np.random.uniform(lower_bound, upper_bound)
 			object_center.append(sampled_coord)
 		centers.append(object_center)
 	return centers
