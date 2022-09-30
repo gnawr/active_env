@@ -46,13 +46,15 @@ def generate_random_env_set(feat_list, set_size):
 	# Sample the parametrized objects
 	human_object_centers = sample_centers(human_regions)
 	laptop_object_centers = sample_centers(laptop_regions)
+	print 'HUMAN OBJECT CENTERS', human_object_centers
+	print 'LAPTOP OBJECT CENTERS', laptop_object_centers
 
 	# sample from the set of object locations to create a list of object combinations
 	env_set_indices = []
 	while len(env_set_indices) < set_size:
 		# Sample from the different object sets
-		human_idx = np.randint(low=0, high=num_human_regions)
-		laptop_idx = np.randint(low=0, high=num_laptop_regions)
+		human_idx = np.random.randint(low=0, high=num_human_regions)
+		laptop_idx = np.random.randint(low=0, high=num_laptop_regions)
 		object_indices = [human_idx, laptop_idx]
 		# Skip duplicates
 		if object_indices not in env_set_indices:
@@ -85,13 +87,9 @@ def sample_centers(regions):
 		for coord_idx in np.arange(3):
 			# sample a coordinate within the range of the region bounds
 			bounds = [bot_left_corner[coord_idx], top_right_corner[coord_idx]]
-                        bounds.sort()
-                        
-                        lower_bound, upper_bound = bounds
-                        print 'bot left', bot_left_corner
-                        print 'bot left corner type', type(bot_left_corner)
-                
-                        sampled_coord = np.random.uniform(lower_bound, upper_bound)
+            bounds.sort()   
+            lower_bound, upper_bound = bounds
+            sampled_coord = np.random.uniform(lower_bound, upper_bound)
 			object_center.append(sampled_coord)
 		centers.append(object_center)
 	return centers
