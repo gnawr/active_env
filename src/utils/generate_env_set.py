@@ -87,9 +87,9 @@ def sample_centers(regions):
 		for coord_idx in np.arange(3):
 			# sample a coordinate within the range of the region bounds
 			bounds = [bot_left_corner[coord_idx], top_right_corner[coord_idx]]
-            bounds.sort()   
-            lower_bound, upper_bound = bounds
-            sampled_coord = np.random.uniform(lower_bound, upper_bound)
+			bounds.sort()
+			lower_bound, upper_bound = bounds
+			sampled_coord = np.random.uniform(lower_bound, upper_bound)
 			object_center.append(sampled_coord)
 		centers.append(object_center)
 	return centers
