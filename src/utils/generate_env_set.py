@@ -46,8 +46,6 @@ def generate_random_env_set(feat_list, set_size):
 	# Sample the parametrized objects
 	human_object_centers = sample_centers(human_regions)
 	laptop_object_centers = sample_centers(laptop_regions)
-	print 'HUMAN OBJECT CENTERS', human_object_centers
-	print 'LAPTOP OBJECT CENTERS', laptop_object_centers
 
 	# sample from the set of object locations to create a list of object combinations
 	env_set_indices = []
