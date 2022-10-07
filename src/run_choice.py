@@ -19,7 +19,7 @@ class RunChoice(object):
 		"""Initialize parameters for this simulation."""
 		#--- ARGUMENTS --- (TODO: yaml later)
 
-		num_rounds = 1
+		num_rounds = 10
 		model_filename = "jaco_dynamics"
 		# feat_list = ["table", "human", "laptop"]
 		# feat_list = ["efficiency", "human", "laptop"]
@@ -86,7 +86,6 @@ class RunChoice(object):
 			print('ITERATION ', i)
 
 			env, env_idx, learner, info_gains = self.cmdp.choose_env(self.P_bt)
-
 			# # Use TrajOpt for giving a demonstration
 			# xi_d = self.human.give_demo(env_idx)
 

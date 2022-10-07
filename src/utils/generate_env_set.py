@@ -103,5 +103,5 @@ def sample_centers(regions):
 
 if __name__ == '__main__':
 	feat_list = ["human", "table", "laptop"]
-	set_size = 10
+	set_size = 20
 	generate_random_env_set(feat_list, set_size)

@@ -27,7 +27,7 @@ class ChoiceMDP(object):
 		self.eps = 1e-100
 
 		# learners
-		if self.num_envs > 1:
+		if self.control_idx == -1: # experiment
 			self.learners = [DemoLearner(feat_list, env, constants, precompute=True) for env in self.envs]
 		else:
 			self.learners = [DemoLearner(feat_list, env, constants) for env in self.envs]
@@ -36,9 +36,9 @@ class ChoiceMDP(object):
 		"""Generate the environment options. """
 		print control_idx, self.object_centers_dict
 
-		if self.is_control:
+		if self.control_idx >= 0: # single env baselines
 			return [Environment(self.model_filename, self.object_centers_dict[control_idx], show=False)]
-		else:
+		else: # random env baseline + experiment
 			num_envs = len(self.object_centers_dict.keys())
 			print "Generating environments..."
 			return [Environment(self.model_filename, self.object_centers_dict[i], show=False) for i in np.arange(num_envs)]
@@ -54,7 +54,11 @@ class ChoiceMDP(object):
 			- learner: learner for the chosen env
 		"""
 		if self.is_control:
-			return self.envs[0], 0, self.learners[0], None
+			if self.control_idx >= 0: # single env baseline
+				return self.envs[0], 0, self.learners[0], None
+			elif self.control_idx == -2:
+				chosen_env_idx = np.random.randint(low=0, high=self.num_envs)
+				return self.envs[chosen_env_idx], chosen_env_idx, self.learners[chosen_env_idx], None
 		else:
 			# TODO: handle info gain computation
 			# Right now, just calculate for one env and measure how long it takes
