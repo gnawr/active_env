@@ -1,5 +1,8 @@
-from utils.environment import Environment
 import numpy as np
+import pickle
+import os
+
+from utils.environment import Environment
 
 def generate_kl_env_set(feat_list, num_envs=20, set_size=10):
 	"""
@@ -64,6 +67,11 @@ def generate_random_env_set(feat_list, set_size):
 		object_centers = {'HUMAN_CENTER': human_object_centers[object_indices[0]],
 						  'LAPTOP_CENTER': laptop_object_centers[object_indices[1]]}
 		object_centers_dict[env_idx] = object_centers
+	
+	here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
+	savefile = "/data/env_sets/env_set_human_laptop_table.p"
+	pickle.dump(object_centers_dict, open( here + savefile, "wb" ))
+	print "Saved in: ", savefile
 
 	return object_centers_dict
 
@@ -91,3 +99,9 @@ def sample_centers(regions):
 			object_center.append(sampled_coord)
 		centers.append(object_center)
 	return centers
+
+
+if __name__ == '__main__':
+	feat_list = ["human", "table", "laptop"]
+	set_size = 10
+	generate_random_env_set(feat_list, set_size)

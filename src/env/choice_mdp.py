@@ -34,8 +34,10 @@ class ChoiceMDP(object):
 
 	def gen_envs(self, control_idx, show):
 		"""Generate the environment options. """
+		print control_idx, self.object_centers_dict
+
 		if self.is_control:
-			return [Environment(self.model_filename, self.object_centers_dict[control_idx])]
+			return [Environment(self.model_filename, self.object_centers_dict[control_idx], show=False)]
 		else:
 			num_envs = len(self.object_centers_dict.keys())
 			print "Generating environments..."

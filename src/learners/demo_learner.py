@@ -4,6 +4,8 @@ import itertools
 import pickle
 import matplotlib.pyplot as plt
 import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import ast
 import time
 
@@ -57,9 +59,14 @@ class DemoLearner(object):
 		self.max_features = np.max(self.Phi_rands, axis=0)
 		self.min_features = np.min(self.Phi_rands, axis=0)
 		self.scaling_coeffs = [{"min": self.min_features[i], "max": self.max_features[i]} for i in np.arange(self.num_features)]
+		
+		print 'DEBUG Len of denominator set: ', len(self.Phi_rands)
+		print 'DEBUG max: ', self.max_features
+		print 'DEBUG min: ', self.min_features
 
 		# Todo apply scaling coeffs
-		self.Phi_rands = (self.Phi_rands - self.min_features) / (self.max_features - self.min_features)
+		self.eps = 1e-5 # To avoid divide by zero
+		self.Phi_rands = (self.Phi_rands - self.min_features) / (self.max_features - self.min_features + self.eps) 
 
 		# Pre-compute the observation model. Might want to save this for later
 		# To get obs model for specific trajectory: self.full_obs_model[traj_index]
@@ -103,7 +110,7 @@ class DemoLearner(object):
 			
 		# Apply scaling coefficients
 		summed = np.array(np.sum(np.matrix(new_features), axis=0))
-		Phi_H = (summed - self.min_features) / (self.max_features - self.min_features)
+		Phi_H = (summed - self.min_features) / (self.max_features - self.min_features + self.eps)
 		Phi_H = Phi_H.T
 		# print "Phi_H: ", Phi_H
 

@@ -19,7 +19,7 @@ class RunChoice(object):
 		"""Initialize parameters for this simulation."""
 		#--- ARGUMENTS --- (TODO: yaml later)
 
-		num_rounds = 10
+		num_rounds = 1
 		model_filename = "jaco_dynamics"
 		# feat_list = ["table", "human", "laptop"]
 		# feat_list = ["efficiency", "human", "laptop"]
@@ -33,35 +33,14 @@ class RunChoice(object):
 		goal_pose = None
 		T = 20.0
 		timestep = 0.5 
-		# object_centers_dict = {0: {'HUMAN_CENTER': [-0.6,-0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.1,0.0]},
+		# self.object_centers_dict = {0: {'HUMAN_CENTER': [-0.6,-0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.1,0.0]},
 		# 					   1: {'HUMAN_CENTER': [-0.6,0.55,0.0], 'LAPTOP_CENTER': [-0.4,-0.1,0.0]},
-		# 					   # 2: {'HUMAN_CENTER': [-0.9,-0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-		# 					   # 3: {'HUMAN_CENTER': [-0.3, 0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
+		# 					   2: {'HUMAN_CENTER': [-0.9,-0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
+		# 					   3: {'HUMAN_CENTER': [-0.3, 0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
 		# 					   }
 
-		# Sanity check environments
-		object_centers_dict = {
-							   0: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
-							   1: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-							   2: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
-							   3: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
-							   4: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
-							   5: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-							   6: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
-							   7: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
-							   8: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
-							   9: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-							   10: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
-							   11: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
-							   12: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
-							   13: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-							   14: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
-							   15: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
-							   16: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
-							   17: {'HUMAN_CENTER': [-0.9, -0.55,0.0], 'LAPTOP_CENTER': [-1.0,-0.3,0.0]},
-							   18: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
-							   19: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
-							   }
+
+		object_centers_path = "/data/env_sets/env_set_human_laptop_table.p"
 
 		constants = {'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
 					 'betas_list': [10.0],
@@ -81,7 +60,12 @@ class RunChoice(object):
 		self.control_idx = control_idx
 		self.is_control = control_idx != -1
 
-		self.cmdp = ChoiceMDP(model_filename=model_filename, object_centers_dict=object_centers_dict, control_idx=control_idx, feat_list=feat_list, constants=constants)
+		# Load in object centers
+		here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../'))
+		self.object_centers_dict = pickle.load(open(here + object_centers_path, "rb"))
+		print 'OBJECT CENTERS', type(self.object_centers_dict)
+
+		self.cmdp = ChoiceMDP(model_filename=model_filename, object_centers_dict=self.object_centers_dict, control_idx=control_idx, feat_list=feat_list, constants=constants)
 		envs = self.cmdp.envs
 		self.num_envs = len(envs)
 
@@ -130,24 +114,31 @@ class RunChoice(object):
 
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
+			metadata_file_path = os.path.join(os.getcwd(), 'data/metadata/1006-control' + str(self.control_idx) +'.npz')
+			np.savez(metadata_file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
+			viz_path = 'data/control_1006_env' + str(self.control_idx)
+			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
 		else:
 			title_suffix = 'experiment, 4 choices'
+			file_path = os.path.join(os.getcwd(), 'data/metadata/1006-exp.npz')
+			np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
+			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_1006')
 
-		# Saving time taken
-		end = time.time()
-		print 'TIME FOR 10 ITERATIONS: ', end - start
-		time_taken = end-start
-		file_path = os.path.join(os.getcwd(), 'data/time_0913.txt')
-		with open(file_path, 'w') as f:
-			f.write(str(time_taken))
+		# # Saving time taken
+		# end = time.time()
+		# print 'TIME FOR 10 ITERATIONS: ', end - start
+		# time_taken = end-start
+		# file_path = os.path.join(os.getcwd(), 'data/time_0930.txt')
+		# with open(file_path, 'w') as f:
+		# 	f.write(str(time_taken))
 
 
-		file_path = os.path.join(os.getcwd(), 'data/exp_0914_metadata.npz')
-		np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
+		# file_path = os.path.join(os.getcwd(), 'data/exp_0914_metadata.npz')
+		# np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
 
 		
 
-		learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='')
+		# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='')
 
 		# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_0909_5demo')
 
@@ -156,21 +147,24 @@ class RunChoice(object):
 
 
 if __name__ == "__main__":
-	# # #--- Run controls --- #
-	# control_idx = 0
+	run_type = int(sys.argv[1])
 
-	# simulation = RunChoice(control_idx=control_idx)
-	# simulation.run()
-
-
-	#--- Run experiment --- #
-	simulation = RunChoice(control_idx=-1)
-	simulation.run()
+	# TODO: set extra params to fix save info
+	if run_type >= 0:
+		# #--- Run controls --- #
+		simulation = RunChoice(control_idx=run_type)
+		simulation.run()
+	elif run_type == -1:
+		#--- Run experiment --- #
+		simulation = RunChoice(control_idx=-1)
+		simulation.run()
+	elif run_type == -2:
+		simulation = RunChoice(control_idx=-2)
+		simulation.run()
 
 	# #--- Print metadata --- #
 	# path = '../data/exp_cost_0908_metadata.npz'
 	# data = np.load(path)
-
 	# print path
 	# print 'ENVS CHOSEN', data['envs_chosen']
 	# print 'INFO GAINS', data['info_gain_options']
