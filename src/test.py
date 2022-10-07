@@ -23,68 +23,39 @@ import time
 class DevTest(unittest.TestCase):
 
 
-	# def test_demo_inference(self):
-	# 	loadfile = '../config/demo_inference.yaml'
-	# 	demo_inf = DemoInference(loadfile)
-	# 	print('post', demo_inf.learner.P_bt)
-	# 	expected = np.array(
-	# 		[[0.00000000e+000, 7.18048503e-155, 7.12646977e-144,
- #        	8.63608124e-063, 8.77103520e-001, 1.22896480e-001,
- #        	1.95965048e-215, 0.00000000e+000, 0.00000000e+000,
- #        	2.60659839e-272, 3.05391785e-142, 7.36857027e-243,
- #        	5.35314651e-128, 0.00000000e+000, 0.00000000e+000,
- #        	2.46860748e-082, 9.89941688e-187, 0.00000000e+000,
- #        	1.29038981e-055]])
-	# 	differences = demo_inf.learner.P_bt - expected
-	# 	self.assertAlmostEqual(0, np.sum(differences))
 
 	def test_env_gen(self):
 		model_filename = "jaco_dynamics"
 		
+		# object_centers_dict = {
+		# 					   # 0: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
+		# 					   1: {'HUMAN_CENTER': [-0.7, -0.55,0.0], 'LAPTOP_CENTER': [-1.05, -0.1, 0.0]},
+		# 					   # 2: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
+		# 					   # 3: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
+		# 					   }
 
-		human_center_options = [[-0.6,0.55,0.0]]
-		# human_center_options = [[-0.6,-0.55,0.0]]
-		# human_center_options = [[-0.9,-0.55,0.0]]
-		# human_center_options = [[-0.3, 0.55,0.0]]
-
-
-		# human_center_options = [[-0.6, -0.55, 0.0],
-								# [-0.6, 0.0, 0.0],
-								# [0.0, -0.55, 0.0]
-
-		# laptop_center_options = [[-0.4,-0.1,0.0]]						
-		laptop_center_options = [[-0.7929,-0.1,0.0]]
-
-		# laptop_center_options = [[-1.0,-0.3,0.0]]
-
-		
-								
-		# laptop_center_options = [[-0.7929,-0.1,0.0],
-								 # [-0.7929,-0.2,0.0]]
-		object_centers_dict = {
-							   # 0: {'HUMAN_CENTER': [-0.4, 0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.15,0.0]},
-							   1: {'HUMAN_CENTER': [-0.7, -0.55,0.0], 'LAPTOP_CENTER': [-1.05, -0.1, 0.0]},
-							   # 2: {'HUMAN_CENTER': [-0.3,-0.55,0.0], 'LAPTOP_CENTER': [-0.3,-0.3,0.0]},
-							   # 3: {'HUMAN_CENTER': [-0.5, 0.55,0.0], 'LAPTOP_CENTER': [-0.6, 0.1,0.0]},
-							   }
+		object_centers_path = "/data/env_sets/env_set_human_laptop_table.p"
+		# Load in object centers
+		here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../'))
+		object_centers_dict = pickle.load(open(here + object_centers_path, "rb"))
 
 
 		for object_centers in object_centers_dict.values():
-				env = Environment(model_filename, object_centers)
-				
-				# #sphere
-				# objects_path = '../data'
-				
-				# env.env.Load('{:s}/sphere.xml'.format(objects_path))
-				# mug = env.env.GetKinBody('sphere')
-				# body = mug
-				# body.SetName("pt"+str(len(env.bodies)))
-				# env.env.Add(body, True)
-				# env.bodies.append(body)
+			env = Environment(model_filename, object_centers)
+			
+			# #sphere
+			# objects_path = '../data'
+			
+			# env.env.Load('{:s}/sphere.xml'.format(objects_path))
+			# mug = env.env.GetKinBody('sphere')
+			# body = mug
+			# body.SetName("pt"+str(len(env.bodies)))
+			# env.env.Add(body, True)
+			# env.bodies.append(body)
 
-				
-				raw_input("Press Enter to continue...")
-				env.kill_environment()
+			
+			raw_input("Press Enter to continue...")
+			env.kill_environment()
 
 	def viz_positions(self):
 		model_filename = 'jaco_dynamics'
