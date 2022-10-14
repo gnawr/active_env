@@ -138,7 +138,7 @@ class ChoiceMDP(object):
 			best_trajs.append(traj)
 		return best_trajs
 
-	def give_sampled_traj(self, env_idx, theta, num_demos=1, T=20.0, beta=30):
+	def give_sampled_traj(self, env_idx, theta, num_demos=1, T=20.0, beta=35):
 		# Give the a sampled traj
 		env = self.envs[env_idx]
 		learner = self.learners[env_idx]
@@ -150,15 +150,6 @@ class ChoiceMDP(object):
 
 		traj_strs = learner.traj_strs
 		best_traj_idx = np.random.choice(a=len(learner.traj_strs), size=1, p=P_xi)[0]
-
-		# DEBUGGING
-		print "TRUE BEST TRAJ COST:    ", np.min(costs)
-		print "SAMPLED TRAJ COST:      ", costs[best_traj_idx]
-
-		print "BEST 10 TRAJ COSTS:     ", [costs[i] for i in costs.argsort()[:10]]
-		best_10_traj_idx = np.random.choice(a=len(learner.traj_strs), size=10, p=P_xi)
-		print "SAMPLED 10 TRAJ COSTS:  ", [costs[i] for i in best_10_traj_idx]
-		# END DEBUGGING
 
 		best_traj_str = learner.traj_strs[best_traj_idx]
 		best_traj_waypts = np.array(ast.literal_eval(best_traj_str))

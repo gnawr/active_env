@@ -114,15 +114,15 @@ class RunChoice(object):
 
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
-			metadata_file_path = os.path.join(os.getcwd(), 'data/metadata/1006-control' + str(self.control_idx) +'.npz')
+			metadata_file_path = os.path.join(os.getcwd(), 'data/metadata/1014-control' + str(self.control_idx) +'.npz')
 			np.savez(metadata_file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
-			viz_path = 'data/control_1006_env' + str(self.control_idx)
+			viz_path = 'data/control_1014_env' + str(self.control_idx)
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
 		else:
 			title_suffix = 'experiment, 4 choices'
-			file_path = os.path.join(os.getcwd(), 'data/metadata/1006-exp.npz')
+			file_path = os.path.join(os.getcwd(), 'data/metadata/1014-exp.npz')
 			np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
-			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_1006')
+			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_1014')
 
 		# # Saving time taken
 		# end = time.time()
@@ -148,7 +148,10 @@ class RunChoice(object):
 
 if __name__ == "__main__":
 	run_type = int(sys.argv[1])
-	num_rounds = int(sys.argv[2]) # for debugging
+	if len(sys.argv) > 2:
+		num_rounds = int(sys.argv[2]) # for debugging
+	else:
+		num_rounds = 10
 
 	# TODO: set extra params to fix save info
 	if run_type >= 0:
