@@ -151,7 +151,7 @@ class ChoiceMDP(object):
 		traj_strs = learner.traj_strs
 		best_traj_idx = np.random.choice(a=len(learner.traj_strs), size=1, p=P_xi)[0]
 		print "SAMPLED TRAJ REWARD:   ", beta_rewards[best_traj_idx]
-		print "TRUE BEST TRAJ REWARD: ", np.argmin(beta_rewards)
+		print "TRUE BEST TRAJ REWARD: ", np.min(beta_rewards)
 		best_traj_str = learner.traj_strs[best_traj_idx]
 		best_traj_waypts = np.array(ast.literal_eval(best_traj_str))
 
