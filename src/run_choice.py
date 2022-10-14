@@ -123,7 +123,7 @@ class RunChoice(object):
 
 			metadata_file_path = os.path.join(m_folder, 'control' + str(self.control_idx) +'.npz')
 			np.savez(metadata_file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
-			viz_path = os.path.join(v_folder, 'env' + str(self.control_idx)
+			viz_path = os.path.join(v_folder, 'env' + str(self.control_idx))
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
 		else:
 			title_suffix = 'experiment, 4 choices'
