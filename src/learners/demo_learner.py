@@ -42,10 +42,11 @@ class DemoLearner(object):
 		# Trajectory paths.
 		here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
 		self.traj_rand = pickle.load(open(here + constants["trajs_path"], "rb" ))
+		self.traj_strs = self.traj_rand.keys()
 
 		# Compute features for the normalizing trajectories.
 		self.Phi_rands = []
-		for rand_i, traj_str in enumerate(self.traj_rand.keys()):
+		for rand_i, traj_str in enumerate(self.traj_strs):
 			curr_traj = np.array(ast.literal_eval(traj_str))
 			rand_features = self.environment.featurize(curr_traj, self.feat_list)
 			# Phi_rand = np.array([sum(x)/self.feat_range[i] for i,x in enumerate(rand_features)])
@@ -71,7 +72,7 @@ class DemoLearner(object):
 		if precompute:
 			print 'Pre-computing observation model...'
 			start = time.time()
-			for traj_i, traj_str in enumerate(self.traj_rand.keys()):
+			for traj_i, traj_str in enumerate(self.traj_strs):
 				curr_traj = np.array(ast.literal_eval(traj_str))
 				# get P(xi | theta)
 				obs_model = self.calc_obs_model([curr_traj])
@@ -88,7 +89,7 @@ class DemoLearner(object):
 			return self.full_obs_model[traj_index]
 		else:
 			# Get traj from traj_index
-			traj_str = self.traj_rand.keys()
+			traj_str = self.traj_strs[traj_index]
 			traj = np.array(ast.literal_eval(traj_str))
 			return self.calc_obs_model([traj])
 
@@ -113,7 +114,7 @@ class DemoLearner(object):
 		# print "Phi_H: ", Phi_H
 
 		# Now compute probabilities for each beta and theta pair.
-		num_trajs = len(self.traj_rand.keys())
+		num_trajs = len(self.traj_strs)
 		P_xi = np.zeros((self.num_betas, self.num_weights))
 		for (weight_i, weight) in enumerate(self.weights_list):
 			# print "Initiating inference with the following weights: ", weight

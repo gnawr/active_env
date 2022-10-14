@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import ast
+from scipy.special import logsumexp
 
 
 from utils.environment import Environment
@@ -70,11 +71,11 @@ class ChoiceMDP(object):
 			# for env_idx in np.arange(1):
 				env = self.envs[env_idx]
 				learner = self.learners[env_idx]
-				num_trajs = len(learner.traj_rand.keys())
+				num_trajs = len(learner.traj_strs)
 				info_gain = 0
 				print "NUM_TRAJS: ", num_trajs		
 
-				for traj_i, traj_str in enumerate(learner.traj_rand.keys()):
+				for traj_i, traj_str in enumerate(learner.traj_strs):
 					curr_traj = np.array(ast.literal_eval(traj_str))
 					# get P(xi | theta)
 					# obs_model = learner.calc_obs_model([curr_traj])
@@ -128,18 +129,33 @@ class ChoiceMDP(object):
 		best_trajs = []
 
 		for best_traj_idx in best_traj_idxs:
-
-			print 'BEST TRAJ REWARD: ', rewards[best_traj_idx]
-			print 'features for best traj: ', learner.Phi_rands[best_traj_idx]
-			best_traj_str = learner.traj_rand.keys()[best_traj_idx]
+			best_traj_str = learner.traj_strs[best_traj_idx]
 			best_traj_waypts = np.array(ast.literal_eval(best_traj_str))
-			print 'BEST TRAJ LENGTH: ', best_traj_waypts.shape
 
 
 			waypts_time = np.linspace(0.0, T, best_traj_waypts.shape[0])
 			traj = Trajectory(best_traj_waypts, waypts_time)
 			best_trajs.append(traj)
 		return best_trajs
+
+	def give_sampled_traj(self, env_idx, theta, num_demos=1, T=20.0, beta=100):
+		# Give the a sampled traj
+		env = self.envs[env_idx]
+		learner = self.learners[env_idx]
+		theta = np.array(theta) / np.linalg.norm(np.array(theta))
+
+		costs = np.dot(np.array(learner.Phi_rands), theta)
+		beta_rewards = -1 * costs * beta
+		P_xi = np.exp(beta_rewards - logsumexp(beta_rewards))
+
+		traj_strs = learner.traj_strs
+		best_traj_idx = np.random.choice(a=len(learner.traj_strs), size=1, p=P_xi)[0]
+		best_traj_str = learner.traj_strs[best_traj_idx]
+		best_traj_waypts = np.array(ast.literal_eval(best_traj_str))
+
+		waypts_time = np.linspace(0.0, T, best_traj_waypts.shape[0])
+		traj = Trajectory(best_traj_waypts, waypts_time)
+		return [traj]
 
 
 

@@ -15,11 +15,11 @@ where the agent can select the environment to receive feedback from.
 
 class RunChoice(object):
 
-	def __init__(self, control_idx):
+	def __init__(self, control_idx, num_rounds=10):
 		"""Initialize parameters for this simulation."""
 		#--- ARGUMENTS --- (TODO: yaml later)
 
-		num_rounds = 10
+		num_rounds = num_rounds
 		model_filename = "jaco_dynamics"
 		# feat_list = ["table", "human", "laptop"]
 		# feat_list = ["efficiency", "human", "laptop"]
@@ -90,7 +90,8 @@ class RunChoice(object):
 			# xi_d = self.human.give_demo(env_idx)
 
 			# Use the best trajectory from the denominator as the demonstration
-			xi_d = self.cmdp.give_best_traj(env_idx, theta=self.feat_weights, num_demos=5)
+			# xi_d = self.cmdp.give_best_traj(env_idx, theta=self.feat_weights, num_demos=5)
+			xi_d = self.cmdp.give_sampled_traj(env_idx, theta=self.feat_weights, num_demos=1)
 
 			# if self.is_control:
 			for traj in xi_d:
@@ -147,11 +148,12 @@ class RunChoice(object):
 
 if __name__ == "__main__":
 	run_type = int(sys.argv[1])
+	num_rounds = int(sys.argv[2]) # for debugging
 
 	# TODO: set extra params to fix save info
 	if run_type >= 0:
 		# #--- Run controls --- #
-		simulation = RunChoice(control_idx=run_type)
+		simulation = RunChoice(control_idx=run_type, num_rounds)
 		simulation.run()
 	elif run_type == -1:
 		#--- Run experiment --- #
