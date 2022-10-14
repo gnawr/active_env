@@ -138,7 +138,7 @@ class ChoiceMDP(object):
 			best_trajs.append(traj)
 		return best_trajs
 
-	def give_sampled_traj(self, env_idx, theta, num_demos=1, T=20.0, beta=50):
+	def give_sampled_traj(self, env_idx, theta, num_demos=1, T=20.0, beta=30):
 		# Give the a sampled traj
 		env = self.envs[env_idx]
 		learner = self.learners[env_idx]
