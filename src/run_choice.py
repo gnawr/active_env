@@ -114,15 +114,30 @@ class RunChoice(object):
 
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
-			metadata_file_path = os.path.join(os.getcwd(), 'data/metadata/1014-control' + str(self.control_idx) +'.npz')
+			m_folder = os.path.join(os.getcwd(), 'data/metadata/1014/')
+			if not os.path.exists(m_folder):
+				os.makedirs(m_folder)
+			v_folder = 'data/control/1014/'
+			if not os.path.exists(v_folder):
+				os.makedirs(v_folder)
+
+			metadata_file_path = os.path.join(m_folder, 'control' + str(self.control_idx) +'.npz')
 			np.savez(metadata_file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
-			viz_path = 'data/control_1014_env' + str(self.control_idx)
+			viz_path = os.path.join(v_folder, 'env' + str(self.control_idx)
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
 		else:
 			title_suffix = 'experiment, 4 choices'
-			file_path = os.path.join(os.getcwd(), 'data/metadata/1014-exp.npz')
+			m_folder = os.path.join(os.getcwd(), 'data/metadata/1014')
+			if not os.path.exists(m_folder):
+				os.makedirs(m_folder)
+			file_path = os.path.join(m_folder,'exp.npz')
 			np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
-			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_1014')
+			
+			v_folder = 'data/exp/'
+			if not os.path.exists(v_folder):
+				os.makedirs(v_folder)
+			v_filepath = os.path.join(v_folder, '1014')
+			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=v_filepath)
 
 		# # Saving time taken
 		# end = time.time()
@@ -154,7 +169,11 @@ if __name__ == "__main__":
 		num_rounds = 10
 
 	# TODO: set extra params to fix save info
-	if run_type >= 0:
+	if run_type == 100: # run controls of every single env
+		for idx in np.arange(20):
+			simulation = RunChoice(control_idx=idx, num_rounds=num_rounds)
+			simulation.run()
+	elif run_type >= 0:
 		# #--- Run controls --- #
 		simulation = RunChoice(control_idx=run_type, num_rounds=num_rounds)
 		simulation.run()
