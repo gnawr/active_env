@@ -150,8 +150,16 @@ class ChoiceMDP(object):
 
 		traj_strs = learner.traj_strs
 		best_traj_idx = np.random.choice(a=len(learner.traj_strs), size=1, p=P_xi)[0]
-		print "SAMPLED TRAJ REWARD:   ", costs[best_traj_idx]
-		print "TRUE BEST TRAJ REWARD: ", np.min(costs)
+
+		# DEBUGGING
+		print "TRUE BEST TRAJ COST:    ", np.min(costs)
+		print "SAMPLED TRAJ COST:      ", costs[best_traj_idx]
+
+		print "BEST 10 TRAJ COSTS:     ", costs.argsort()[:10]
+		best_10_traj_idx = np.random.choice(a=len(learner.traj_strs), size=10, p=P_xi)
+		print "SAMPLED 10 TRAJ COSTS:  ", [costs[i] for i in best_10_traj_idx]
+		# END DEBUGGING
+
 		best_traj_str = learner.traj_strs[best_traj_idx]
 		best_traj_waypts = np.array(ast.literal_eval(best_traj_str))
 
