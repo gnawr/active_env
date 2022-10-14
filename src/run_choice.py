@@ -153,7 +153,7 @@ if __name__ == "__main__":
 	# TODO: set extra params to fix save info
 	if run_type >= 0:
 		# #--- Run controls --- #
-		simulation = RunChoice(control_idx=run_type, num_rounds)
+		simulation = RunChoice(control_idx=run_type, num_rounds=num_rounds)
 		simulation.run()
 	elif run_type == -1:
 		#--- Run experiment --- #
