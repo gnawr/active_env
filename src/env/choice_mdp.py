@@ -155,7 +155,7 @@ class ChoiceMDP(object):
 		print "TRUE BEST TRAJ COST:    ", np.min(costs)
 		print "SAMPLED TRAJ COST:      ", costs[best_traj_idx]
 
-		print "BEST 10 TRAJ COSTS:     ", costs.argsort()[:10]
+		print "BEST 10 TRAJ COSTS:     ", [costs[i] for i in costs.argsort()[:10]]
 		best_10_traj_idx = np.random.choice(a=len(learner.traj_strs), size=10, p=P_xi)
 		print "SAMPLED 10 TRAJ COSTS:  ", [costs[i] for i in best_10_traj_idx]
 		# END DEBUGGING
