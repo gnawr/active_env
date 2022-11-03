@@ -205,7 +205,7 @@ class DemoLearner(object):
 
 
 		print(beliefs.shape)
-		plt.imshow(beliefs, cmap='Blues', interpolation='nearest')
+		plt.imshow(beliefs, vmin=0, vmax=1, cmap='Blues', interpolation='nearest')
 		plt.colorbar()
 
 		weights_rounded = [[round(i,2) for i in j] for j in self.weights_list]
@@ -220,5 +220,5 @@ class DemoLearner(object):
 			plt.savefig(save)
 		else:
 			plt.show()
-		
+		plt.clf()
 		return
