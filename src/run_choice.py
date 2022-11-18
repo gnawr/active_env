@@ -23,7 +23,7 @@ class RunChoice(object):
 		model_filename = "jaco_dynamics"
 		# feat_list = ["table", "human", "laptop"]
 		# feat_list = ["efficiency", "human", "laptop"]
-		feat_list = ["human", "table", "laptop"]
+		feat_list = ["human", "coffee", "laptop"]
 		# feat_list = ["efficiency", "table", "laptop"]
 
 		max_iter = 50
@@ -48,7 +48,7 @@ class RunChoice(object):
 					 'FEAT_RANGE': {'table':1.0, 'coffee':1.0, 'laptop':1.6, 'human':1.6, 'efficiency':0.01},
 					 }
 		# feat_weights = [0.0, 1.0, 1.0]
-		feat_weights = [1.0, 0.0, 1.0]
+		feat_weights = [0.0, 1.0, 1.0]
 
 		#--- Initialize parameters ---#
 		self.feat_weights = feat_weights
@@ -114,10 +114,10 @@ class RunChoice(object):
 
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
-			m_folder = os.path.join(os.getcwd(), 'data/metadata/1014/')
+			m_folder = os.path.join(os.getcwd(), 'data/metadata/1111/')
 			if not os.path.exists(m_folder):
 				os.makedirs(m_folder)
-			v_folder = 'data/control/1014/'
+			v_folder = 'data/control/1111/'
 			if not os.path.exists(v_folder):
 				os.makedirs(v_folder)
 
@@ -127,7 +127,7 @@ class RunChoice(object):
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
 		else:
 			title_suffix = 'experiment, 4 choices'
-			m_folder = os.path.join(os.getcwd(), 'data/metadata/1014')
+			m_folder = os.path.join(os.getcwd(), 'data/metadata/1111')
 			if not os.path.exists(m_folder):
 				os.makedirs(m_folder)
 			file_path = os.path.join(m_folder,'exp.npz')
@@ -136,7 +136,7 @@ class RunChoice(object):
 			v_folder = 'data/exp/'
 			if not os.path.exists(v_folder):
 				os.makedirs(v_folder)
-			v_filepath = os.path.join(v_folder, '1014')
+			v_filepath = os.path.join(v_folder, '1111')
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=v_filepath)
 
 		# # Saving time taken

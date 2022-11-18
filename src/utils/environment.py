@@ -110,22 +110,30 @@ class Environment(object):
 		---
 		input waypoint, output scalar feature
 		"""
-		# get rotation transform, convert it to euler coordinates, and make sure the end effector is upright
-		def mat2euler(mat):
-			gamma = np.arctan2(mat[2,1], mat[2,2])
-			beta = np.arctan2(-mat[2,0], np.sqrt(mat[2,1]**2 + mat[2,2]**2))
-			alpha = np.arctan2(mat[1,0], mat[0,0])
-			return np.array([gamma,beta,alpha])
+		# # get rotation transform, convert it to euler coordinates, and make sure the end effector is upright
+		# def mat2euler(mat):
+		# 	gamma = np.arctan2(mat[2,1], mat[2,2])
+		# 	beta = np.arctan2(-mat[2,0], np.sqrt(mat[2,1]**2 + mat[2,2]**2))
+		# 	alpha = np.arctan2(mat[1,0], mat[0,0])
+		# 	return np.array([gamma,beta,alpha])
+
+		# if len(waypt) < 10:
+		# 	waypt = np.append(waypt.reshape(7), np.array([0,0,0]))
+		# 	waypt[2] += math.pi
+		# self.robot.SetDOFValues(waypt)
+		# EE_link = self.robot.GetLinks()[7]
+		# R = EE_link.GetTransform()[:3,:3]
+		# [yaw, pitch, roll] = mat2euler(R)
+		# #return sum(abs(EE_link.GetTransform()[:2,:3].dot([1,0,0])))
+		# return (pitch + 1.5)
 
 		if len(waypt) < 10:
 			waypt = np.append(waypt.reshape(7), np.array([0,0,0]))
 			waypt[2] += math.pi
 		self.robot.SetDOFValues(waypt)
 		EE_link = self.robot.GetLinks()[7]
-		R = EE_link.GetTransform()[:3,:3]
-		[yaw, pitch, roll] = mat2euler(R)
-		#return sum(abs(EE_link.GetTransform()[:2,:3].dot([1,0,0])))
-		return (pitch + 1.5)
+		Rx = EE_link.GetTransform()[:3,0]
+		return 1 - EE_link.GetTransform()[:3,0].dot([0,0,1])
 
 	# -- Distance to Laptop -- #
 
