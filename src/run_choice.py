@@ -43,7 +43,8 @@ class RunChoice(object):
 		object_centers_path = "/data/env_sets/env_set_human_laptop_table.p"
 
 		constants = {'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
-					 'betas_list': [10.0],
+					#  'betas_list': [10.0],
+					 'betas_list': [0.1, 0.3, 1.0, 3.0, 10.0, 30.0], #TODO: RETURN
 					 'weight_vals': [0.0, 0.5, 1.0], # Per feature theta options.
 					 'FEAT_RANGE': {'table':1.0, 'coffee':1.0, 'laptop':1.6, 'human':1.6, 'efficiency':0.01},
 					 }
@@ -105,7 +106,7 @@ class RunChoice(object):
 			envs_chosen.append(env_idx)
 			info_gain_options.append(info_gains)
 
-		beliefs = np.array(beliefs).reshape((self.num_rounds + 1, 19))
+		# beliefs = np.array(beliefs).reshape((self.num_rounds + 1, 19)) #TODO: RETURN
 		print 'BELIEFS OVER TIME: ', beliefs
 		if not self.is_control:
 			print 'ENVS CHOSEN: ', envs_chosen
@@ -114,20 +115,22 @@ class RunChoice(object):
 
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
-			m_folder = os.path.join(os.getcwd(), 'data/metadata/1014/')
+			m_folder = os.path.join(os.getcwd(), 'data/metadata/1207/')
 			if not os.path.exists(m_folder):
 				os.makedirs(m_folder)
-			v_folder = 'data/control/1014/'
+			v_folder = 'data/control/1207/'
 			if not os.path.exists(v_folder):
 				os.makedirs(v_folder)
 
 			metadata_file_path = os.path.join(m_folder, 'control' + str(self.control_idx) +'.npz')
 			np.savez(metadata_file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
 			viz_path = os.path.join(v_folder, 'env' + str(self.control_idx))
-			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
+			# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
+			learner.visualize_posterior(beliefs[-1], title=title_suffix, save=viz_path)
+
 		else:
 			title_suffix = 'experiment, 4 choices'
-			m_folder = os.path.join(os.getcwd(), 'data/metadata/1014')
+			m_folder = os.path.join(os.getcwd(), 'data/metadata/1207')
 			if not os.path.exists(m_folder):
 				os.makedirs(m_folder)
 			file_path = os.path.join(m_folder,'exp.npz')
@@ -136,8 +139,10 @@ class RunChoice(object):
 			v_folder = 'data/exp/'
 			if not os.path.exists(v_folder):
 				os.makedirs(v_folder)
-			v_filepath = os.path.join(v_folder, '1014')
-			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=v_filepath)
+			v_filepath = os.path.join(v_folder, '1207')
+			# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=v_filepath)
+			learner.visualize_posterior(beliefs[-1], title=title_suffix, save=v_filepath)
+
 
 		# # Saving time taken
 		# end = time.time()
@@ -151,13 +156,6 @@ class RunChoice(object):
 		# file_path = os.path.join(os.getcwd(), 'data/exp_0914_metadata.npz')
 		# np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
 
-		
-
-		# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='')
-
-		# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='data/exp_0909_5demo')
-
-		
 
 
 

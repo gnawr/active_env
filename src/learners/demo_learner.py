@@ -179,14 +179,14 @@ class DemoLearner(object):
 		self.visualize_posterior(posterior)
 		return weights
 
-	def visualize_posterior(self, post):
+	def visualize_posterior(self, post, title='', save=''):
 		matplotlib.rcParams['font.sans-serif'] = "Arial"
 		matplotlib.rcParams['font.family'] = "Times New Roman"
 		matplotlib.rcParams.update({'font.size': 15})
 
 
 		print(post.shape)
-		plt.imshow(post, cmap='Blues', interpolation='nearest')
+		plt.imshow(post, vmin=0, vmax=0.3, cmap='Blues', interpolation='nearest')
 		plt.colorbar()
 
 		weights_rounded = [[round(i,2) for i in j] for j in self.weights_list]
@@ -194,9 +194,17 @@ class DemoLearner(object):
 		plt.yticks(range(len(self.betas_list)), list(self.betas_list))
 		plt.xlabel(r'$\theta$', fontsize=15)
 		plt.ylabel(r'$\beta$',fontsize=15)
-		plt.title(r'Joint Posterior Belief b($\theta$, $\beta$)')
+		if title:
+			plt.title(r'Belief b($\theta$) for ' + title)
+		else:	
+			plt.title(r'Joint Posterior Belief b($\theta$, $\beta$)')
 		plt.tick_params(length=0)
-		plt.show()
+
+		if save:
+			plt.savefig(save)
+		else:
+			plt.show()
+		plt.clf()
 
 	def visualize_stacked_posterior(self, beliefs, title='', save = ''):
 		matplotlib.rcParams['font.sans-serif'] = "Arial"
