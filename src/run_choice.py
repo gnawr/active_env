@@ -112,12 +112,17 @@ class RunChoice(object):
 
 		if info_gains: print 'INFO GAIN OPTIONS :', info_gain_options
 
+
+
+		# CHANGE THIS BETWEEN RUNS
+		date_str = '230202'
+
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
-			m_folder = os.path.join(os.getcwd(), 'data/metadata/1111/')
+			m_folder = os.path.join(os.getcwd(), 'data/metadata/' + date_str + '/')
 			if not os.path.exists(m_folder):
 				os.makedirs(m_folder)
-			v_folder = 'data/control/1111/'
+			v_folder = 'data/control/'+ date_str + '/'
 			if not os.path.exists(v_folder):
 				os.makedirs(v_folder)
 
@@ -127,7 +132,7 @@ class RunChoice(object):
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
 		else:
 			title_suffix = 'experiment, 4 choices'
-			m_folder = os.path.join(os.getcwd(), 'data/metadata/1111')
+			m_folder = os.path.join(os.getcwd(), 'data/metadata/' + date_str)
 			if not os.path.exists(m_folder):
 				os.makedirs(m_folder)
 			file_path = os.path.join(m_folder,'exp.npz')
@@ -136,7 +141,7 @@ class RunChoice(object):
 			v_folder = 'data/exp/'
 			if not os.path.exists(v_folder):
 				os.makedirs(v_folder)
-			v_filepath = os.path.join(v_folder, '1111')
+			v_filepath = os.path.join(v_folder, date_str)
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=v_filepath)
 
 		# # Saving time taken

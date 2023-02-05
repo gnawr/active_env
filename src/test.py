@@ -7,6 +7,8 @@ import yaml
 import unittest
 import ast
 
+import openravepy
+from openravepy import *
 from utils.openrave_utils import *
 from utils.environment import Environment
 from utils.generate_env_set import *
@@ -68,24 +70,100 @@ class DevTest(unittest.TestCase):
 		goal = np.array([210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0, 0., 0., 0.])
 		candlestick = np.array([180.0, 180.0, 180.0, 180.0, 180.0, 180.0, 180.0, 0., 0., 0.])
 
-		env.robot.SetDOFValues(candlestick * (math.pi / 180.0))
-		ee_xyz = manipToCartesian(env.robot, 0.0)
-		print('Cartesian of manip:', ee_xyz)
-		raw_input("Visualizing CANDLESTICK. Press Enter to continue...")
+		
+		# plotCupTraj(env.env,env.robot,env.bodies,[candlestick[:7]* (math.pi / 180.0)])
+		# ee_xyz = manipToCartesian(env.robot, 0.0)
+		# print('Cartesian of manip:', ee_xyz)
+		# raw_input("Visualizing CANDLESTICK. Press Enter to continue...")
+				
 
-		dof_radians = start * (math.pi / 180.0)
-		dof_radians[2] += math.pi
-		env.robot.SetDOFValues(dof_radians)
-		ee_xyz = manipToCartesian(env.robot, 0.0)
-		print('Cartesian of manip:', ee_xyz)
-		raw_input("Visualizing START. Press Enter to continue...")
+		# workspace: find the 2 other Start and Goal positions 
+		start_1 = np.array([104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 135.0, 0., 0., 0.])
+		start_2 = np.array([104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 45.0, 0., 0., 0.])
+		start_3 = np.array([104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 315.0, 0., 0., 0.])
+		starts = [start, start_1, start_2, start_3]
 
-		dof_radians = goal * (math.pi / 180.0)
-		dof_radians[2] += math.pi
-		env.robot.SetDOFValues(dof_radians)
+		goal1 = np.array([210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 232.0, 0., 0., 0.])
+		goal2 = np.array([210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 142.0, 0., 0., 0.])
+		goal3 = np.array([210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 52.0, 0., 0., 0.])
+
+		goals = [goal, goal1, goal2, goal3]
+
+		for i, st in enumerate(starts):
+			plotCupTraj(env.env,env.robot,env.bodies,[st[:7]* (math.pi / 180.0)])
+			ee_xyz = manipToCartesian(env.robot, 0.0)
+			print('Cartesian of manip:', ee_xyz)
+			raw_input("Visualizing START" + str(i) + ". Press Enter to continue...")
+
+
+		# for i, gl in enumerate(goals):
+		# 	plotCupTraj(env.env,env.robot,env.bodies,[gl[:7]* (math.pi / 180.0)])
+		# 	ee_xyz = manipToCartesian(env.robot, 0.0)
+		# 	print('Cartesian of manip:', ee_xyz)
+		# 	raw_input("Visualizing gl" + str(i) + ". Press Enter to continue...")
+
+
+		env.kill_environment
+
+	def find_starts_goals_w_ik(self):
+		model_filename = 'jaco_dynamics'
+		human_center = [-0.6,0.55,0.0]
+		laptop_center = [-0.7929,-0.1,0.0]
+		object_centers = {'HUMAN_CENTER': human_center, 'LAPTOP_CENTER': laptop_center}
+		goal = np.array([210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0, 0., 0., 0.])
+		candlestick = np.array([180.0, 180.0, 180.0, 180.0, 180.0, 180.0, 180.0, 0., 0., 0.])
+	
+
+		env = Environment(model_filename, object_centers)
+		start = np.array([104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 225.0, 0., 0., 0.])	
+		start_xyz = manipToCartesian(env.robot, 0.0)
+		print 'true start xyz: ', start_xyz
+
+		# # Try 3DTranslation
+		# manip = env.robot.GetActiveManipulator()
+		# ikmodel = databases.inversekinematics.InverseKinematicsModel(env.robot,iktype=IkParameterization.Type.Translation3D)
+		# if not ikmodel.load():
+		# 	ikmodel.autogenerate()
+
+		# with env.robot: # lock environment and save robot state
+		# 	env.robot.SetDOFValues(start * (math.pi / 180.0))
+		# 	Tee = manip.GetEndEffectorTransform() # get end effector transform
+		# 	ikparam = IkParameterization(Tee[0:3, 3],ikmodel.iktype) # build up the translation3d ik query
+		# 	sols = manip.FindIKSolutions(ikparam, IkFilterOptions.CheckEnvCollisions) # get all solutions
+		# 	print 'solutions', sols
+		# 	print 'shape', sols.shape
+
+		# for i, sol in enumerate(sols[:10]):
+		# 	plotCupTraj(env.env,env.robot,env.bodies,[sol])
+		# 	ee_xyz = manipToCartesian(env.robot, 0.0)
+		# 	print('Cartesian of manip:', ee_xyz)
+		# 	env.env.UpdatePublishedBodies()
+		# 	raw_input("Visualizing START_SOLUTION " + str(i) + ". Press Enter to continue...")
+
+
+		# Try 6dTransform
+		manip = env.robot.GetActiveManipulator()
+		ikmodel = databases.inversekinematics.InverseKinematicsModel(env.robot,iktype=IkParameterization.Type.Transform6D)
+		if not ikmodel.load():
+			ikmodel.autogenerate()
+
+		with env.robot: # lock environment and save robot state
+			env.robot.SetDOFValues(start * (math.pi / 180.0))
+			Tee = manip.GetEndEffectorTransform() # get end effector transform
+			print 'transform', Tee
+			# ikparam = IkParameterization(Tee,ikmodel.iktype) # build up the translation3d ik query
+			sol = manip.FindIKSolution(Tee, IkFilterOptions.CheckEnvCollisions) # get all solutions
+			print 'solutions', sol
+			print 'shape', sol.shape
+
+		# plot sol
+
+		env.robot.SetDOFValues(sol, manip.GetArmIndices())
 		ee_xyz = manipToCartesian(env.robot, 0.0)
-		print('Cartesian of manip:', ee_xyz)
-		raw_input("Visualizing GOAL. Press Enter to continue...")
+		print('Cartesian of manip sol:', ee_xyz)
+		env.env.UpdatePublishedBodies()
+		raw_input("Visualizing START_SOLUTION 6D. Press Enter to continue...")
+
 
 		env.kill_environment
 

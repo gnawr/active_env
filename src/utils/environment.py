@@ -28,6 +28,7 @@ class Environment(object):
 			plotLaptop(self.env,self.bodies,object_centers['LAPTOP_CENTER'])
 			plotCabinet(self.env)
 			plotSphere(self.env,self.bodies,object_centers['HUMAN_CENTER'], 0.015)
+			
 
 	# ---- Custom environmental features ---- #
 	def featurize(self, waypts, feat_list):

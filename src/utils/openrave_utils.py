@@ -221,13 +221,13 @@ def plotCabinet(env):
 	color = np.array([0.05,0.6,0.3])
 	cabinet.GetLinks()[0].GetGeometries()[0].SetDiffuseColor(color)
 
-def plotMug(env):
-	# Load table into environment
-	objects_path = find_in_workspaces(
-			project='iact_control',
-			path='src/data',
-			first_match_only=True)[0]
-	env.Load('{:s}/mug.xml'.format(objects_path))
+# def plotMug(env):
+# 	# Load table into environment
+# 	objects_path = find_in_workspaces(
+# 			project='iact_control',
+# 			path='src/data',
+# 			first_match_only=True)[0]
+# 	env.Load('{:s}/mug.xml'.format(objects_path))
 
 def plotMan(env):
 	"""
