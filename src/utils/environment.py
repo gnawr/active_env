@@ -21,6 +21,7 @@ class Environment(object):
 		self.object_centers = object_centers
 
 		self.show = show
+		# Below visualization may be messed up when moving objects around
 		if self.show:
 			# Plot the table and table mount, and other desired objects.
 			plotTable(self.env)

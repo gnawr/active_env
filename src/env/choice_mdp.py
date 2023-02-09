@@ -38,7 +38,7 @@ class ChoiceMDP(object):
 		print control_idx, self.object_centers_dict
 
 		if self.control_idx >= 0: # single env baselines
-			return [Environment(self.model_filename, self.object_centers_dict[control_idx], show=True)]
+			return [Environment(self.model_filename, self.object_centers_dict[control_idx], show=False)]
 		else: # random env baseline + experiment
 			num_envs = len(self.object_centers_dict.keys())
 			print "Generating environments..."

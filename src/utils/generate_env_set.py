@@ -21,7 +21,7 @@ def generate_kl_env_set(feat_list, num_envs=20, set_size=10):
 		# Generate
 
 
-def generate_random_env_set(feat_list, set_size):
+def generate_random_env_set(feat_list, set_size, save=False):
 	"""Generate a random environment set given the features in the feature list.
 	Regions are defined by bottom left and top right coordinates.
 	Returns:
@@ -68,13 +68,13 @@ def generate_random_env_set(feat_list, set_size):
 						  'LAPTOP_CENTER': laptop_object_centers[object_indices[1]]}
 		object_centers_dict[env_idx] = object_centers
 	
-	here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
-	savefile = "/data/env_sets/env_set_human_laptop_table.p"
-	pickle.dump(object_centers_dict, open( here + savefile, "wb" ))
-	print "Saved in: ", savefile
+	if save:
+		here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
+		savefile = "/data/env_sets/env_set_human_laptop_table.p"
+		pickle.dump(object_centers_dict, open( here + savefile, "wb" ))
+		print "Saved in: ", savefile
 
 	return object_centers_dict
-
 
 
 def sample_centers(regions):
@@ -99,6 +99,33 @@ def sample_centers(regions):
 			object_center.append(sampled_coord)
 		centers.append(object_center)
 	return centers
+
+
+def sample_single_environment():
+	# Sample a single human center and a single laptop center from all possible configurations.
+	human_regions = [[[-0.2, -0.55, 0.0], [-0.7, -0.55, 0.0]], # top side left
+					 [[-0.7, -0.55, 0.0], [-1.3, -0.55, 0.0]], # top side right
+					 [[-1.3, 0.0, 0.0], [-1.3, -0.55, 0.0]], # right side top
+					 [[-1.3, 0.55, 0.0], [-1.3, 0.0, 0.0]], # right side bottom
+					 [[-0.2, 0.55, 0.0], [-0.7, 0.55, 0.0]], # bottom side left
+					 [[-0.7, 0.55, 0.0], [-1.3, 0.55, 0.0]] # bottom side right
+					 ]
+
+	laptop_regions = [[[-1.05, -0.1, 0.0], [-0.675, -0.3, 0.0]], # top left quadrant
+					  [[-0.675, -0.1, 0.0], [-1.05, -0.3, 0.0]], # top right quadrant
+					  [[-0.3, 0.1, 0.0], [-0.675, -0.1, 0.0]], # bottom left quadrant
+					  [[-0.675, 0.1, 0.0], [-1.05, -0.1, 0.0]], # bottom right quadrant 
+					  ]
+	num_human_regions = len(human_regions)
+	num_laptop_regions = len(laptop_regions)
+	human_region = human_regions[np.random.randint(low=0, high=num_human_regions)]
+	laptop_region = laptop_regions[np.random.randint(low=0, high=num_laptop_regions)]
+
+	centers = sample_centers([human_region, laptop_region])
+	object_centers = {'HUMAN_CENTER': centers[0], 'LAPTOP_CENTER': centers[1]}
+	return object_centers
+
+
 
 
 if __name__ == '__main__':
