@@ -133,12 +133,12 @@ class TrajoptPlanner(object):
 		if goal_pose is not None:
 			print("Using goal pose for trajopt computation.")
 			xyz_target = goal_pose
-			quat_target = [1,0,0,0] # wxyz
+			# quat_target = [1,0,0,0] # wxyz
 			constraint = [
 				{
 					"type": "pose",
 					"params" : {"xyz" : xyz_target,
-								"wxyz" : quat_target,
+								# "wxyz" : quat_target,
 								"link": "j2s7s300_link_7",
 								"rot_coeffs" : [0,0,0],
 								"pos_coeffs" : [35,35,35],
