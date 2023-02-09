@@ -60,69 +60,6 @@ def generate_traj_set(feat_list):
 	print "Used the following weight-combos: ", weight_pairs
 
 
-def generate_varied_traj_set(feat_list):
-	# Before calling this function, you need to decide what features you care
-	# about, from a choice of table, coffee, human, origin, and laptop.
-	pick1 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 310.8] # original
-	pick2 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 190.8]
-	pick3 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 70.8]
-
-	picks = [pick1, pick2, pick3]
-	place = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0]
-	start = np.array(pick)*(math.pi/180.0)
-	goal = np.array(place)*(math.pi/180.0)
-	goal_pose = None
-	T = 20.0
-	timestep = 0.5
-
-
-	# Openrave parameters for the environment.
-	model_filename = "jaco_dynamics"
-	object_centers = {'HUMAN_CENTER': [-0.6,-0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.1,0.0]}
-	environment = Environment(model_filename, object_centers)
-	# TODO: create environments list
-	environments = [environment]
-
-	# Planner Setup
-	max_iter = 50
-	num_waypts = 5
-	feat_list = [x.strip() for x in feat_list.split(',')]
-	num_features = len(feat_list)
-	planner = TrajoptPlanner(feat_list, max_iter, num_waypts, environment)
-
-	# Construct set of weights of interest.
-	betas_list = [10.0]
-	weight_vals = [0.0, 0.5, 1.0]
-	self.betas_list = constants["betas_list"]
-	self.betas_list.reverse()
-	weight_vals = constants["weight_vals"]
-	self.weights_list = list(itertools.product(weight_vals, repeat=self.num_features))
-	if (0.0,)*len(self.feat_list) in self.weights_list:
-		self.weights_list.remove((0.0,) * self.num_features)
-	self.weights_list = [w / np.linalg.norm(w) for w in self.weights_list]
-	self.weights_list = set([tuple(i) for i in self.weights_list])
-	self.weights_list = [list(i) for i in self.weights_list]
-
-	# do features need to be normalized here?
-
-	traj_rand = {}
-	for start in start_configs:
-		for (w_i, weights) in enumerate(weight_pairs):
-			traj = planner.replan(start, goal, goal_pose, weights, T, timestep)
-			Phi = environment.featurize(traj.waypts, feat_list)
-			# Getting rid of bad, out-of-bounds trajectories (trajs that go through the table)
-			if any(phi < 0.0 for phi in Phi):
-				continue
-			traj = traj.waypts.tolist()
-			if repr(traj) not in traj_rand:
-				traj_rand[repr(traj)] = weights
-
-	here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
-	savefile = "/data/traj_sets/traj_set_table_laptop_mug.p"
-	pickle.dump(traj_rand, open( here + savefile, "wb" ))
-	print "Saved in: ", savefile
-	print "Used the following weight-combos: ", weight_pairs
-
 if __name__ == '__main__':
 	feat_list = sys.argv[1]
 	generate_traj_set(feat_list)
