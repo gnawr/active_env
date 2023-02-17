@@ -4,6 +4,7 @@ import sys, os
 import numpy as np
 import time
 
+from tqdm import tqdm
 from utils.openrave_utils import *
 from env.choice_mdp import ChoiceMDP
 from env.opt_human import OptHuman
@@ -18,6 +19,8 @@ class RunChoice(object):
 	def __init__(self, control_idx, num_rounds=10):
 		"""Initialize parameters for this simulation."""
 		#--- ARGUMENTS --- (TODO: yaml later)
+
+		start_init = time.time()
 
 		num_rounds = num_rounds
 		model_filename = "jaco_dynamics"
@@ -42,7 +45,8 @@ class RunChoice(object):
 
 		object_centers_path = "/data/env_sets/env_set_human_laptop_table.p"
 
-		constants = {'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
+		constants = {'trajs_path': 	"/data/traj_sets/traj_set_human_coffee_laptop.p",
+					#  'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
 					 'betas_list': [10.0],
 					 'weight_vals': [0.0, 0.5, 1.0], # Per feature theta options.
 					 'FEAT_RANGE': {'table':1.0, 'coffee':1.0, 'laptop':1.6, 'human':1.6, 'efficiency':0.01},
@@ -72,17 +76,22 @@ class RunChoice(object):
 		self.human = OptHuman(feat_list=feat_list, max_iter=max_iter, num_waypts=num_waypts, environments=envs, start=start, goal=goal, goal_pose=goal_pose, T=T, timestep=timestep, weights=feat_weights, seed=None)
 		self.P_bt = self.initial_belief()
 
+		end_init = time.time()
+		init_time = end_init - start_init
+		file_path = os.path.join(os.getcwd(), 'data/time_init_230212.txt')
+		with open(file_path, 'w') as f:
+			f.write(str(init_time))
+
 	def initial_belief(self):			
 		return self.cmdp.learners[0].P_bt
-
 
 	def run(self):
 		"""Run the simulation."""
 		beliefs = [self.P_bt]
 		envs_chosen = []
 		info_gain_options = []
-		start = time.time()
-		for i in np.arange(self.num_rounds):
+		start_time = time.time()
+		for i in tqdm(range(self.num_rounds)):
 			print('ITERATION ', i)
 
 			env, env_idx, learner, info_gains = self.cmdp.choose_env(self.P_bt)
@@ -115,7 +124,7 @@ class RunChoice(object):
 
 
 		# CHANGE THIS BETWEEN RUNS
-		date_str = '230202'
+		date_str = '230215'
 
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))
@@ -131,7 +140,7 @@ class RunChoice(object):
 			viz_path = os.path.join(v_folder, 'env' + str(self.control_idx))
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=viz_path)
 		else:
-			title_suffix = 'experiment, 4 choices'
+			title_suffix = 'experiment, 20 choices'
 			m_folder = os.path.join(os.getcwd(), 'data/metadata/' + date_str)
 			if not os.path.exists(m_folder):
 				os.makedirs(m_folder)
@@ -144,19 +153,17 @@ class RunChoice(object):
 			v_filepath = os.path.join(v_folder, date_str)
 			learner.visualize_stacked_posterior(beliefs, title=title_suffix, save=v_filepath)
 
-		# # Saving time taken
-		# end = time.time()
-		# print 'TIME FOR 10 ITERATIONS: ', end - start
-		# time_taken = end-start
-		# file_path = os.path.join(os.getcwd(), 'data/time_0930.txt')
-		# with open(file_path, 'w') as f:
-		# 	f.write(str(time_taken))
+			# Saving time taken
+			end = time.time()
+			print 'TIME FOR 10 ITERATIONS of experiment: ', end - start_time
+			time_taken = end-start_time
+			file_path = os.path.join(os.getcwd(), 'data/time_0215.txt')
+			with open(file_path, 'w') as f:
+				f.write(str(time_taken))
 
 
 		# file_path = os.path.join(os.getcwd(), 'data/exp_0914_metadata.npz')
 		# np.savez(file_path, envs_chosen=np.array(envs_chosen), info_gain_options=np.array(info_gain_options), beliefs=beliefs)
-
-		
 
 		# learner.visualize_stacked_posterior(beliefs, title=title_suffix, save='')
 
@@ -175,7 +182,7 @@ if __name__ == "__main__":
 
 	# TODO: set extra params to fix save info
 	if run_type == 100: # run controls of every single env
-		for idx in np.arange(20):
+		for idx in np.arange(20)[::-1]:
 			simulation = RunChoice(control_idx=idx, num_rounds=num_rounds)
 			simulation.run()
 	elif run_type >= 0:

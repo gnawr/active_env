@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import ast
 import time
 
+from tqdm import tqdm
+
 class DemoLearner(object):
 	"""
 	This class performs demonstration inference given human trajectories.
@@ -46,7 +48,8 @@ class DemoLearner(object):
 
 		# Compute features for the normalizing trajectories.
 		self.Phi_rands = []
-		for rand_i, traj_str in enumerate(self.traj_strs):
+		print('computing denominator features')
+		for rand_i, traj_str in tqdm(enumerate(self.traj_strs)):
 			curr_traj = np.array(ast.literal_eval(traj_str))
 			rand_features = self.environment.featurize(curr_traj, self.feat_list)
 			# Phi_rand = np.array([sum(x)/self.feat_range[i] for i,x in enumerate(rand_features)])
