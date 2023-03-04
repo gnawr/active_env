@@ -13,19 +13,19 @@ def generate_orientation_traj_set(feat_list):
 	# Before calling this function, you need to decide what features you care
 	# about, from a choice of table, coffee, human, origin, and laptop.
 	# pick0 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 310.8]
-	pick1 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 135.0]
+	pick1 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 135.0] # upside down
 	# pick2 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 45.0]
-	pick3 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 315.0]
+	pick3 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 315.0] # upright
 
-	place0 = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0]
+	place0 = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0] # upright
 	# place1 = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 232.0]
-	place2 = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 142.0]
+	place2 = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 142.0] # upside down
 	# place3 = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 52.0]
 
 	# starts = np.array([pick0, pick1, pick2, pick3])*(math.pi/180.0)
 	# goals = np.array([place0, place1, place2, place3])*(math.pi/180.0)
 
-	starts = np.array([pick1, pick3])*(math.pi/180.0)
+	starts = np.array([pick3, pick1])*(math.pi/180.0)
 	goals = np.array([place0, place2])*(math.pi/180.0)
 	goal_pose = None
 	T = 20.0
