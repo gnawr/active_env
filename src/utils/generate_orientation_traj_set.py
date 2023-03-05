@@ -12,6 +12,8 @@ from generate_env_set import sample_single_environment
 def generate_orientation_traj_set(feat_list):
 	# Before calling this function, you need to decide what features you care
 	# about, from a choice of table, coffee, human, origin, and laptop.
+
+
 	# pick0 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 310.8]
 	pick1 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 135.0] # upside down
 	# pick2 = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 45.0]
@@ -25,8 +27,8 @@ def generate_orientation_traj_set(feat_list):
 	# starts = np.array([pick0, pick1, pick2, pick3])*(math.pi/180.0)
 	# goals = np.array([place0, place1, place2, place3])*(math.pi/180.0)
 
-	starts = np.array([pick3, pick1])*(math.pi/180.0)
-	goals = np.array([place0, place2])*(math.pi/180.0)
+	starts = np.array([pick3, pick1])*(math.pi/180.0) # upright, upside down
+	goals = np.array([place0, place2])*(math.pi/180.0) # upright, upside down
 	goal_pose = None
 	T = 20.0
 	timestep = 0.5
@@ -60,18 +62,14 @@ def generate_orientation_traj_set(feat_list):
 	# num_envs_to_sample = 20
 	# num_envs_to_sample = 5 # for small trajset
 
-
-
 	# Call the planner for each case
 	start_time = time.time()
 	print('start time', start_time)
+	print 'Expected number of trajs per start', len(object_centers_dict) * len(goals) * len(weights_list)
 
-	traj_rand = {}
-	coffee_features = []
-
-	print 'Expected number of trajs', len(object_centers_dict) * len(starts) * len(goals) * len(weights_list)
-
-	for start in starts:
+	for start_idx, start in enumerate(starts):
+		traj_rand = {}
+		coffee_features = []
 		for goal in goals:
 			for env_idx in np.arange(len(object_centers_dict)):
 				# FIXED ENVS CASE
@@ -99,21 +97,21 @@ def generate_orientation_traj_set(feat_list):
 					if repr(traj) not in traj_rand:
 						traj_rand[repr(traj)] = weights
 
-	here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
-	savefile = "/data/traj_sets/traj_set_fixed_envs_human_coffee_laptop.p"
-	pickle.dump(traj_rand, open( here + savefile, "wb" ))
+		here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
+		savefile = "/data/traj_sets/start" + str(start_idx) + "traj_set_fixed_envs_human_coffee_laptop.p"
+		pickle.dump(traj_rand, open( here + savefile, "wb" ))
 
-	print 'Number of trajs: ', len(traj_rand)
-	print "Saved in: ", savefile
-	print "Used the following number of weight-combos: ", len(weights_list)
-	print 'Coffee feature max: ', np.max(coffee_features)
-	print 'Coffee feature min: ', np.min(coffee_features)
+		print 'Number of trajs: ', len(traj_rand)
+		print "Saved in: ", savefile
+		print "Used the following number of weight-combos: ", len(weights_list)
+		print 'Coffee feature max: ', np.max(coffee_features)
+		print 'Coffee feature min: ', np.min(coffee_features)
 
 
 	end_time = time.time()
 	print 'TIME FOR GENERATION: ', end_time - start_time
 	time_taken = end_time - start_time
-	file_path = os.path.join(os.getcwd(), 'time_0223.txt')
+	file_path = os.path.join(os.getcwd(), 'time_0304.txt')
 	with open(file_path, 'w') as f:
 		f.write(str(time_taken))
 
