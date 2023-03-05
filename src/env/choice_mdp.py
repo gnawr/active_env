@@ -37,6 +37,8 @@ class ChoiceMDP(object):
 		"""Generate the environment options. """
 		print control_idx, self.object_centers_dict
 
+		# TODO: Pass in the trajset idx for every Environment
+
 		if self.control_idx >= 0: # single env baselines
 			return [Environment(self.model_filename, self.object_centers_dict[control_idx], show=False)]
 		else: # random env baseline + experiment

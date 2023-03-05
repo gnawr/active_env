@@ -31,9 +31,14 @@ class RunChoice(object):
 
 		max_iter = 50
 		num_waypts = 5
-		start = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 310.8]
-		goal = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0]
+
+		# TODO: incorporate starts/goals into obj_centers_dict
+		# start = [104.2, 151.6, 183.8, 101.8, 224.2, 216.9, 310.8]
+		# goal = [210.8, 101.6, 192.0, 114.7, 222.2, 246.1, 322.0]
 		goal_pose = None
+		starts = [...]
+		goals = [...]
+
 		T = 20.0
 		timestep = 0.5 
 		# self.object_centers_dict = {0: {'HUMAN_CENTER': [-0.6,-0.55,0.0], 'LAPTOP_CENTER': [-0.7929,-0.1,0.0]},
@@ -45,8 +50,11 @@ class RunChoice(object):
 
 		object_centers_path = "/data/env_sets/env_set_human_laptop_table.p"
 
-		constants = {'trajs_path': 	"/data/traj_sets/traj_set_human_coffee_laptop.p",
+		constants = {
+					#'trajs_path': 	"/data/traj_sets/traj_set_human_coffee_laptop.p",
 					#  'trajs_path': "/data/traj_sets/traj_rand_merged_H.p",
+					 'trajs_path_dict': {0: "/data/traj_sets/start0traj_set_human_coffee_laptop.p",
+					 					1: "/data/traj_sets/start1traj_set_human_coffee_laptop.p"}
 					 'betas_list': [10.0],
 					 'weight_vals': [0.0, 0.5, 1.0], # Per feature theta options.
 					 'FEAT_RANGE': {'table':1.0, 'coffee':1.0, 'laptop':1.6, 'human':1.6, 'efficiency':0.01},
@@ -66,7 +74,17 @@ class RunChoice(object):
 
 		# Load in object centers
 		here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../'))
-		self.object_centers_dict = pickle.load(open(here + object_centers_path, "rb"))
+		ocd = pickle.load(open(here + object_centers_path, "rb"))
+		# TODO: Augment obj_centers with starts and goals and env trajset
+		self.object_centers_dict = {}
+		env_idx = 0
+		for start_idx, start in enumerate(starts):
+			for obj_centers in ocd.values():
+				self.object_centers_dict[env_idx] = obj_centers
+				self.object_centers_dict[env_idx]['START'] = (start_idx, start)
+				self.object_centers_dict[env_idx]['TRAJSET_IDX'] = start_idx
+
+
 		print 'OBJECT CENTERS', type(self.object_centers_dict)
 
 		self.cmdp = ChoiceMDP(model_filename=model_filename, object_centers_dict=self.object_centers_dict, control_idx=control_idx, feat_list=feat_list, constants=constants)
@@ -99,7 +117,7 @@ class RunChoice(object):
 			# xi_d = self.human.give_demo(env_idx)
 
 			# Use the best trajectory from the denominator as the demonstration
-			# xi_d = self.cmdp.give_best_traj(env_idx, theta=self.feat_weights, num_demos=5)
+			# TODO: make sure cmdp.give_sampled_traj uses the correct traj set
 			xi_d = self.cmdp.give_sampled_traj(env_idx, theta=self.feat_weights, num_demos=1)
 
 			# if self.is_control:
@@ -109,6 +127,7 @@ class RunChoice(object):
 			plotCupTraj(env.env, env.robot, env.bodies, [xi_d[0].waypts[-1]], color=[0,1,0])
 
 			new_belief = learner.learn_posterior(trajs=xi_d, P_bt=self.P_bt)
+
 			self.P_bt = new_belief
 			beliefs.append(self.P_bt)
 			envs_chosen.append(env_idx)
@@ -124,7 +143,7 @@ class RunChoice(object):
 
 
 		# CHANGE THIS BETWEEN RUNS
-		date_str = '230215'
+		date_str = '230304'
 
 		if self.is_control:
 			title_suffix = 'control, ENV {}'.format(str(self.control_idx))

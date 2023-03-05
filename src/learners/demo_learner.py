@@ -42,6 +42,7 @@ class DemoLearner(object):
 		self.P_bt = np.ones((self.num_betas, self.num_weights)) / (self.num_betas * self.num_weights)
 
 		# Trajectory paths.
+		# TODO: retrieve trajs_path from env
 		here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
 		self.traj_rand = pickle.load(open(here + constants["trajs_path"], "rb" ))
 		self.traj_strs = self.traj_rand.keys()
